@@ -1,12 +1,13 @@
+import random
 from jogo_da_velha import branco, token, verifica_ganhador
+
 score = {
     "EMPATE": 0,
     "X": 1,
     "O": -1
 }
 
-
-#funções de posições 
+# funções de posições 
 def get_posicoes(board):
     posicoes = []
 
@@ -17,21 +18,40 @@ def get_posicoes(board):
 
     return posicoes
 
-#função de movimento da I.A.
+# funções de movimento da I.A:
+# Implementação da IA "Fácil" (Aleatória)
+def movimento_ia_facil(board, jogador):
+    possibilidades = get_posicoes(board)
+    if possibilidades:
+        escolha = random.choice(possibilidades)
+        return escolha[0], escolha[1]
+    return None, None
+
+# Implementação da IA "Média" (Probabilística)
+def movimento_ia_medio(board, jogador):
+    chance = random.random()
+    if chance < 0.5:
+        # 50% de chance de jogar com perfeição (Minimax)
+        return movimento_ia(board, jogador)
+    else:
+        # 50% de chance de jogar aleatoriamente (Fácil)
+        return movimento_ia_facil(board, jogador)
+
+# Implementação da IA "Difícil" (Minimax)
 def movimento_ia(board, jogador):
     possibilidades = get_posicoes(board)
     melhor_valor = None
     melhor_movimento = None
 
     for possibilidade in possibilidades:
-        board[possibilidade[0]] [possibilidade[1]] = token[jogador]
+        board[possibilidade[0]][possibilidade[1]] = token[jogador]
         valor = minimax(board, jogador)
-        board[possibilidade[0]] [possibilidade[1]] = branco
+        board[possibilidade[0]][possibilidade[1]] = branco
 
         if melhor_valor is None: 
             melhor_valor = valor
             melhor_movimento = possibilidade
-        elif jogador == 0 :
+        elif jogador == 0:
             if(valor > melhor_valor):
                 melhor_valor = valor
                 melhor_movimento = possibilidade
@@ -42,7 +62,7 @@ def movimento_ia(board, jogador):
 
     return melhor_movimento[0], melhor_movimento[1]
 
-def minimax (board, jogador):
+def minimax(board, jogador):
     ganhador = verifica_ganhador(board)
 
     if(ganhador):
@@ -54,9 +74,9 @@ def minimax (board, jogador):
     melhor_valor = None 
 
     for possibilidade in possibilidades:
-        board[possibilidade[0]] [possibilidade[1]] = token[jogador]
+        board[possibilidade[0]][possibilidade[1]] = token[jogador]
         valor = minimax(board, jogador)
-        board[possibilidade[0]] [possibilidade[1]] = branco
+        board[possibilidade[0]][possibilidade[1]] = branco
 
         if melhor_valor is None: 
             melhor_valor = valor
