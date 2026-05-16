@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from jogo_da_velha import criar_board, faz_movimento, get_input_valido, print_board, verifica_ganhador, verifica_movimento
-from minimax import movimento_ia, movimento_ia_facil, movimento_ia_medio
+from minimax import movimentoIA_dificil, movimentoIA_facil, movimentoIA_medio
 
 def imprime_barra():
     print("===================")
@@ -25,11 +25,11 @@ while(not ganhador):
 
     if(jogador == 0):
         if opcao_dificuldade == '1':
-            i, j = movimento_ia_facil(board, jogador)
+            i, j = movimentoIA_facil(board, jogador)
         elif opcao_dificuldade == '2':
-            i, j = movimento_ia_medio(board, jogador)
+            i, j = movimentoIA_medio(board, jogador)
         else:
-            i, j = movimento_ia(board, jogador)
+            i, j = movimentoIA_dificil(board, jogador)
     else:
         i = get_input_valido("Digite a linha: ")
         j = get_input_valido("Digite a coluna: ")

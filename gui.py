@@ -8,7 +8,7 @@ import pygame
 from jogo_da_velha import criar_board, faz_movimento, get_input_valido, \
                           print_board, verifica_ganhador, verifica_movimento
 
-from minimax import movimento_ia, movimento_ia_facil, movimento_ia_medio
+from minimax import movimentoIA_dificil, movimentoIA_facil, movimentoIA_medio
 
 # Ao iniciar, tenta inicializar o áudio. Se falhar, ignora e segue o jogo.
 try:
@@ -168,11 +168,11 @@ def main():
         else:
             # Fluxo condicional de IAs
             if dificuldade == "fácil":
-                i, j = movimento_ia_facil(board, jogador)
+                i, j = movimentoIA_facil(board, jogador)
             elif dificuldade == "médio":
-                i, j = movimento_ia_medio(board, jogador)
+                i, j = movimentoIA_medio(board, jogador)
             else:
-                i, j = movimento_ia(board, jogador)
+                i, j = movimentoIA_dificil(board, jogador)
         
         if i is not None and j is not None and verifica_movimento(board, i, j):
             faz_movimento(board, i, j, jogador)
