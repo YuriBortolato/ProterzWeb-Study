@@ -10,16 +10,8 @@ from jogo_da_velha import criar_board, faz_movimento, get_input_valido, \
 
 from minimax import movimentoIA_dificil, movimentoIA_facil, movimentoIA_medio
 
-# Ao iniciar, tenta inicializar o áudio. Se falhar, ignora e segue o jogo.
-try:
-    pygame.mixer.init()
-    pygame.mixer.music.load('musica.mp3')
-    pygame.mixer.music.play()
-except pygame.error as e:
-    print(f"Aviso: Não foi possível inicializar o áudio ({e}). O jogo rodará sem som.")
-
+# Inicializa o sistema de fontes do Pygame
 pygame.font.init()
-
 
 def get_bg_color(dificuldade):
     if dificuldade == "fácil":
@@ -141,6 +133,20 @@ def main():
                     dificuldade = "médio"
                 elif event.key == pygame.K_3 or event.key == pygame.K_KP3:
                     dificuldade = "difícil"
+
+    # Áudio por Dificuldade
+    try:
+        pygame.mixer.init()
+        if dificuldade == "fácil":
+            pygame.mixer.music.load('facil.mp3')
+        elif dificuldade == "médio":
+            pygame.mixer.music.load('medio.mp3')
+        elif dificuldade == "difícil":
+            pygame.mixer.music.load('dificil.mp3')
+        
+        pygame.mixer.music.play(-1)
+    except pygame.error as e:
+        print(f"Aviso: Não foi possível reproduzir a música da dificuldade ({e}).")
 
     redraw_window(win, board, dificuldade)
     pygame.display.update()
