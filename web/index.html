@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade de Jogos com IA</title>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 { margin-bottom: 2rem; color: #38bdf8; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 80%; max-width: 800px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #334155; transition: 0.3s; }
+        .card:hover { border-color: #38bdf8; cursor: pointer; transform: translateY(-5px); }
+        a { text-decoration: none; color: white; display: block; height: 100%; }
+        .disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Arcade Web - AI Games</h1>
+    <div class="grid">
+        <div class="card">
+            <a href="tic-tac-toe/index.html">
+                <h3>Jogo da Velha</h3>
+                <p>Minimax Engine</p>
+            </a>
+        </div>
+        <div class="card disabled">
+            <h3>Xadrez</h3>
+            <p>Em desenvolvimento</p>
+        </div>
+        <div class="card disabled">
+            <h3>Damas</h3>
+            <p>Em desenvolvimento</p>
+        </div>
+    </div>
+</body>
+</html>

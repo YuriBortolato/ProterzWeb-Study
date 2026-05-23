@@ -1,0 +1,10 @@
+body { background: #1e293b; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+.container { text-align: center; background: #334155; padding: 2rem; border-radius: 12px; }
+.board { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; margin: 20px auto; }
+.cell { width: 100px; height: 100px; background: #0f172a; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; cursor: pointer; }
+.cell:hover { background: #475569; }
+.cell.x { color: #38bdf8; }
+.cell.o { color: #ef4444; }
+select { padding: 5px; border-radius: 4px; }
+button { margin-top: 10px; padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; background: #3b82f6; color: white; }
+.back-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; }
