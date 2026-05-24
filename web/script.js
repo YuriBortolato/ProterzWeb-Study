@@ -13,27 +13,48 @@ const menuOverlay = document.getElementById('menuOverlay');
 
 let board = Array(9).fill('');
 let gameActive = true;
-let currentDifficulty = 'hard'; // Padrão para dificuldade máxima
+let currentDifficulty = 'hard';
 let soundEnabled = true;
 const HUMAN = 'X';
 const AI = 'O';
 
-// Configurações de dificuldade
+// --- SISTEMA DE ÁUDIO ---
+const bgMusic = new Audio();
+bgMusic.loop = true;
+
+function updateMusic() {
+    if (currentDifficulty === 'easy') bgMusic.src = 'facil.mp3';
+    else if (currentDifficulty === 'medium') bgMusic.src = 'medio.mp3';
+    else bgMusic.src = 'dificil.mp3';
+
+    if (soundEnabled) {
+        // Tenta tocar a música, mas se o navegador bloquear, apenas loga a mensagem e espera a próxima interação do usuário para tentar novamente.
+        bgMusic.play().catch(() => console.log("Aguardando clique do usuário para iniciar música."));
+    } else {
+        bgMusic.pause();
+    }
+}
+
+// Inicia a música ao carregar a página, mas só tocará após a primeira interação do usuário devido às políticas de autoplay dos navegadores.
+updateMusic();
+
+// --- SISTEMA DE DIFICULDADE ---
 diffButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-        // Remove a classe active de todos os botões
         diffButtons.forEach(b => b.classList.remove('active'));
-        // Adiciona a classe active ao botão clicado
         btn.classList.add('active');
         currentDifficulty = btn.getAttribute('data-diff');
+        updateMusic();
         restartGame();
     });
 });
 
-// Lógica do jogo
+// --- LÓGICA DO JOGO ---
 cells.forEach(cell => cell.addEventListener('click', () => {
     if (!gameActive || cell.textContent !== '') return;
     
+    if (soundEnabled && bgMusic.paused) updateMusic();
+
     // Jogada Humana
     const index = cell.getAttribute('data-index');
     makeMove(index, HUMAN);
@@ -51,9 +72,10 @@ function restartGame() {
     board = Array(9).fill('');
     gameActive = true;
     statusText.innerText = "Sua vez! (X)";
+    statusText.className = ""; // Reseta a classe para remover cores de vitória/empate
     cells.forEach(cell => {
         cell.textContent = '';
-        cell.classList.remove('x', 'o');
+        cell.className = "cell"; // Reseta as classes para remover cores de vitória/empate
     });
 }
 
@@ -61,7 +83,6 @@ function makeMove(index, player) {
     board[index] = player;
     cells[index].textContent = player;
     cells[index].classList.add(player.toLowerCase());
-    playSound(); 
     checkWinner();
 }
 
@@ -131,17 +152,34 @@ function minimax(newBoard, depth, isMaximizing) {
     }
 }
 
+// Função de verificação de vencedor para o jogo normal 
 function checkWinner() {
     const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    
     for (let [a,b,c] of lines) {
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-            statusText.innerText = board[a] === HUMAN ? "🎉 Você venceu!" : "💀 A IA venceu!";
+            if (board[a] === HUMAN) {
+                statusText.innerText = "🎉 Você venceu!";
+                statusText.className = "status-green";
+                cells[a].classList.add("win-green");
+                cells[b].classList.add("win-green");
+                cells[c].classList.add("win-green");
+            } else {
+                statusText.innerText = "💀 A IA venceu!";
+                statusText.className = "status-red";
+                cells[a].classList.add("win-red");
+                cells[b].classList.add("win-red");
+                cells[c].classList.add("win-red");
+            }
             gameActive = false;
             return;
         }
     }
+    
     if (!board.includes('')) {
-        statusText.innerText = "🤝 Deu Velha! (Empate)";
+        statusText.innerText = "🤝 Deu Empate!";
+        statusText.className = "status-gray";
+        cells.forEach(cell => cell.classList.add("tie-gray"));
         gameActive = false;
     }
 }
@@ -155,7 +193,6 @@ function checkWinnerForMinimax() {
 }
 
 // --- SISTEMA DE TEMAS E SOM ---
-
 themeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const icon = themeBtn.querySelector('i');
@@ -171,15 +208,12 @@ soundBtn.addEventListener('click', () => {
     const icon = soundBtn.querySelector('i');
     if (soundEnabled) {
         icon.classList.replace('fa-volume-mute', 'fa-volume-up');
+        updateMusic();
     } else {
         icon.classList.replace('fa-volume-up', 'fa-volume-mute');
+        bgMusic.pause();
     }
 });
-
-// Função para tocar som 
-function playSound() {
-    if (!soundEnabled) return;
-}
 
 menuBtn.addEventListener('click', () => {
     sideMenu.classList.add('open');
