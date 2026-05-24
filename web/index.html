@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade | Jogo da Velha</title>
+    <title>Proterz | Arcade IA</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,18 +11,19 @@
     <div class="top-bar">
         <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
         <div class="right-icons">
-            <button id="soundBtn" class="icon-btn" title="Mutar Som"><i class="fas fa-volume-up"></i></button>
-            <button id="themeBtn" class="icon-btn" title="Trocar Tema"><i class="fas fa-moon"></i></button>
+            <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
+            <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
+            <button id="themeBtn" class="icon-btn" title="Tema"><i class="fas fa-sun"></i></button>
         </div>
     </div>
 
     <div class="container">
-        <h1>Jogo da Velha</h1>
+        <h1 id="gameTitle">Jogo da Velha</h1>
         
         <div class="diff-selector">
-            <button class="diff-btn" data-diff="easy">Fácil</button>
-            <button class="diff-btn" data-diff="medium">Médio</button>
-            <button class="diff-btn active" data-diff="hard">Difícil</button>
+            <button class="diff-btn" data-diff="easy" id="txtEasy">Fácil</button>
+            <button class="diff-btn" data-diff="medium" id="txtMedium">Médio</button>
+            <button class="diff-btn active" data-diff="hard" id="txtHard">Difícil</button>
         </div>
 
         <div class="board" id="board">
@@ -44,11 +45,11 @@
     </div>
 
     <div id="sideMenu" class="side-menu">
-        <h2>Arcade Games</h2>
+        <h2 id="menuTitle">Arcade Games</h2>
         <ul>
-            <li><a href="#" class="active"><i class="fas fa-times"></i> Jogo da Velha</a></li>
-            <li class="disabled"><a href="#"><i class="fas fa-chess-knight"></i> Xadrez (Em breve)</a></li>
-            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> Damas (Em breve)</a></li>
+            <li><a href="#" class="active"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez (Em breve)</span></a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas (Em breve)</span></a></li>
         </ul>
     </div>
     <div id="menuOverlay" class="menu-overlay"></div>

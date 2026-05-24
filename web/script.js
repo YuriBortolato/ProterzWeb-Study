@@ -4,9 +4,9 @@ const statusText = document.getElementById('status');
 const restartBtn = document.getElementById('restart');
 const diffButtons = document.querySelectorAll('.diff-btn');
 
-// Botões da UI
 const themeBtn = document.getElementById('themeBtn');
 const soundBtn = document.getElementById('soundBtn');
+const langBtn = document.getElementById('langBtn');
 const menuBtn = document.getElementById('menuBtn');
 const sideMenu = document.getElementById('sideMenu');
 const menuOverlay = document.getElementById('menuOverlay');
@@ -14,11 +14,69 @@ const menuOverlay = document.getElementById('menuOverlay');
 let board = Array(9).fill('');
 let gameActive = true;
 let currentDifficulty = 'hard';
-let soundEnabled = true;
 const HUMAN = 'X';
 const AI = 'O';
 
-// --- SISTEMA DE ÁUDIO ---
+// SISTEMA DE IDIOMA
+let currentLang = 'PT';
+const texts = {
+    'PT': {
+        title: 'Jogo da Velha',
+        easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
+        restart: 'Reiniciar Partida',
+        turn: 'Sua vez! (X)',
+        win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
+        thinking: 'IA pensando...',
+        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez (Em breve)', menuCheckers: 'Damas (Em breve)'
+    },
+    'EN': {
+        title: 'Tic Tac Toe',
+        easy: 'Easy', medium: 'Medium', hard: 'Hard',
+        restart: 'Restart Match',
+        turn: 'Your turn! (X)',
+        win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
+        thinking: 'AI thinking...',
+        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess (Soon)', menuCheckers: 'Checkers (Soon)'
+    },
+    'ES': {
+        title: 'Tres en Raya',
+        easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
+        restart: 'Reiniciar Partida',
+        turn: '¡Tu turno! (X)',
+        win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
+        thinking: 'IA guessing...',
+        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez (Pronto)', menuCheckers: 'Damas (Pronto)'
+    }
+};
+
+langBtn.addEventListener('click', () => {
+    if (currentLang === 'PT') currentLang = 'EN';
+    else if (currentLang === 'EN') currentLang = 'ES';
+    else currentLang = 'PT';
+    
+    langBtn.innerText = currentLang;
+    updateLanguage();
+});
+
+function updateLanguage() {
+    const t = texts[currentLang];
+    document.getElementById('gameTitle').innerHTML = t.title;
+    document.getElementById('txtEasy').innerText = t.easy;
+    document.getElementById('txtMedium').innerText = t.medium;
+    document.getElementById('txtHard').innerText = t.hard;
+    restartBtn.innerText = t.restart;
+    document.getElementById('menuTitle').innerText = t.menuTitle;
+    document.getElementById('menuTicTac').innerText = t.menuTicTac;
+    document.getElementById('menuChess').innerText = t.menuChess;
+    document.getElementById('menuCheckers').innerText = t.menuCheckers;
+    
+    if (gameActive && statusText.innerText.includes('(X)')) {
+        statusText.innerText = t.turn;
+    }
+}
+
+// SISTEMA DE ÁUDIO
+let volumeState = 2; 
 const bgMusic = new Audio();
 bgMusic.loop = true;
 
@@ -27,18 +85,48 @@ function updateMusic() {
     else if (currentDifficulty === 'medium') bgMusic.src = 'medio.mp3';
     else bgMusic.src = 'dificil.mp3';
 
-    if (soundEnabled) {
-        // Tenta tocar a música, mas se o navegador bloquear, apenas loga a mensagem e espera a próxima interação do usuário para tentar novamente.
-        bgMusic.play().catch(() => console.log("Aguardando clique do usuário para iniciar música."));
+    if (volumeState === 2) {
+        bgMusic.volume = 1.0;
+        bgMusic.play().catch(()=>{});
+    } else if (volumeState === 1) {
+        bgMusic.volume = 0.25; 
+        bgMusic.play().catch(()=>{});
     } else {
-        bgMusic.pause();
+        bgMusic.pause(); 
     }
 }
 
-// Inicia a música ao carregar a página, mas só tocará após a primeira interação do usuário devido às políticas de autoplay dos navegadores.
+soundBtn.addEventListener('click', () => {
+    const icon = soundBtn.querySelector('i');
+    
+    if (volumeState === 2) {
+        volumeState = 1;
+        icon.className = 'fas fa-volume-down';
+    } else if (volumeState === 1) {
+        volumeState = 0;
+        icon.className = 'fas fa-volume-mute';
+    } else {
+        volumeState = 2;
+        icon.className = 'fas fa-volume-up';
+    }
+    updateMusic();
+});
+
 updateMusic();
 
-// --- SISTEMA DE DIFICULDADE ---
+// SISTEMA DE TEMAS
+themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const icon = themeBtn.querySelector('i');
+    
+    if (document.body.classList.contains('dark-mode')) {
+        icon.className = 'fas fa-moon';
+    } else {
+        icon.className = 'fas fa-sun';
+    }
+});
+
+// SISTEMA DE DIFICULDADE
 diffButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         diffButtons.forEach(b => b.classList.remove('active'));
@@ -49,19 +137,17 @@ diffButtons.forEach(btn => {
     });
 });
 
-// --- LÓGICA DO JOGO ---
+// SISTEMA DE JOGO
 cells.forEach(cell => cell.addEventListener('click', () => {
     if (!gameActive || cell.textContent !== '') return;
     
-    if (soundEnabled && bgMusic.paused) updateMusic();
+    if (volumeState > 0 && bgMusic.paused) updateMusic();
 
-    // Jogada Humana
     const index = cell.getAttribute('data-index');
     makeMove(index, HUMAN);
 
-    // Jogada IA
     if (gameActive) {
-        statusText.innerText = "IA pensando...";
+        statusText.innerText = texts[currentLang].thinking;
         setTimeout(makeAiMove, 400);
     }
 }));
@@ -71,11 +157,11 @@ restartBtn.addEventListener('click', restartGame);
 function restartGame() {
     board = Array(9).fill('');
     gameActive = true;
-    statusText.innerText = "Sua vez! (X)";
-    statusText.className = ""; // Reseta a classe para remover cores de vitória/empate
+    statusText.innerText = texts[currentLang].turn;
+    statusText.className = "";
     cells.forEach(cell => {
         cell.textContent = '';
-        cell.className = "cell"; // Reseta as classes para remover cores de vitória/empate
+        cell.className = "cell";
     });
 }
 
@@ -88,7 +174,6 @@ function makeMove(index, player) {
 
 function makeAiMove() {
     let move;
-    
     if (currentDifficulty === 'easy') {
         move = getRandomMove();
     } else if (currentDifficulty === 'medium') {
@@ -96,9 +181,8 @@ function makeAiMove() {
     } else {
         move = getBestMove();
     }
-    
     if (move !== undefined) makeMove(move, AI);
-    if (gameActive) statusText.innerText = "Sua vez! (X)";
+    if (gameActive) statusText.innerText = texts[currentLang].turn;
 }
 
 function getRandomMove() {
@@ -152,20 +236,19 @@ function minimax(newBoard, depth, isMaximizing) {
     }
 }
 
-// Função de verificação de vencedor para o jogo normal 
 function checkWinner() {
     const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     
     for (let [a,b,c] of lines) {
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
             if (board[a] === HUMAN) {
-                statusText.innerText = "🎉 Você venceu!";
+                statusText.innerText = texts[currentLang].win;
                 statusText.className = "status-green";
                 cells[a].classList.add("win-green");
                 cells[b].classList.add("win-green");
                 cells[c].classList.add("win-green");
             } else {
-                statusText.innerText = "💀 A IA venceu!";
+                statusText.innerText = texts[currentLang].lose;
                 statusText.className = "status-red";
                 cells[a].classList.add("win-red");
                 cells[b].classList.add("win-red");
@@ -177,7 +260,7 @@ function checkWinner() {
     }
     
     if (!board.includes('')) {
-        statusText.innerText = "🤝 Deu Empate!";
+        statusText.innerText = texts[currentLang].tie;
         statusText.className = "status-gray";
         cells.forEach(cell => cell.classList.add("tie-gray"));
         gameActive = false;
@@ -191,29 +274,6 @@ function checkWinnerForMinimax() {
     }
     return null;
 }
-
-// --- SISTEMA DE TEMAS E SOM ---
-themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const icon = themeBtn.querySelector('i');
-    if (document.body.classList.contains('dark-mode')) {
-        icon.classList.replace('fa-moon', 'fa-sun');
-    } else {
-        icon.classList.replace('fa-sun', 'fa-moon');
-    }
-});
-
-soundBtn.addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
-    const icon = soundBtn.querySelector('i');
-    if (soundEnabled) {
-        icon.classList.replace('fa-volume-mute', 'fa-volume-up');
-        updateMusic();
-    } else {
-        icon.classList.replace('fa-volume-up', 'fa-volume-mute');
-        bgMusic.pause();
-    }
-});
 
 menuBtn.addEventListener('click', () => {
     sideMenu.classList.add('open');
