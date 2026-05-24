@@ -44,7 +44,7 @@ const texts = {
         restart: 'Reiniciar Partida',
         turn: '¡Tu turno! (X)',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
-        thinking: 'IA guessing...',
+        thinking: 'IA pensando...',
         menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez (Pronto)', menuCheckers: 'Damas (Pronto)'
     }
 };
@@ -76,15 +76,21 @@ function updateLanguage() {
 }
 
 // SISTEMA DE ÁUDIO
-let volumeState = 2; 
+let volumeState = 2; // 2 = Máximo, 1 = Médio, 0 = Mutado
 const bgMusic = new Audio();
 bgMusic.loop = true;
 
-function updateMusic() {
+// Altera a música de fundo com base na dificuldade
+function changeTrackByDifficulty() {
     if (currentDifficulty === 'easy') bgMusic.src = 'facil.mp3';
     else if (currentDifficulty === 'medium') bgMusic.src = 'medio.mp3';
     else bgMusic.src = 'dificil.mp3';
+    
+    applyVolume();
+}
 
+// Aplica o volume atual
+function applyVolume() {
     if (volumeState === 2) {
         bgMusic.volume = 1.0;
         bgMusic.play().catch(()=>{});
@@ -109,10 +115,13 @@ soundBtn.addEventListener('click', () => {
         volumeState = 2;
         icon.className = 'fas fa-volume-up';
     }
-    updateMusic();
+    
+    // 
+    applyVolume();
 });
 
-updateMusic();
+// 
+changeTrackByDifficulty();
 
 // SISTEMA DE TEMAS
 themeBtn.addEventListener('click', () => {
@@ -132,16 +141,16 @@ diffButtons.forEach(btn => {
         diffButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentDifficulty = btn.getAttribute('data-diff');
-        updateMusic();
+        changeTrackByDifficulty();
         restartGame();
     });
 });
 
-// SISTEMA DE JOGO
+// LÓGICA DO JOGO
 cells.forEach(cell => cell.addEventListener('click', () => {
     if (!gameActive || cell.textContent !== '') return;
     
-    if (volumeState > 0 && bgMusic.paused) updateMusic();
+    if (volumeState > 0 && bgMusic.paused) bgMusic.play().catch(()=>{});
 
     const index = cell.getAttribute('data-index');
     makeMove(index, HUMAN);
