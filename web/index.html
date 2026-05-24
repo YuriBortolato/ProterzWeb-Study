@@ -3,44 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade de Jogos com IA</title>
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1 { margin-bottom: 2rem; color: #38bdf8; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 80%; max-width: 800px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #334155; transition: 0.3s; }
-        .card:hover { border-color: #38bdf8; cursor: pointer; transform: translateY(-5px); }
-        a { text-decoration: none; color: white; display: block; height: 100%; }
-        .disabled { opacity: 0.5; cursor: not-allowed; }
-    </style>
+    <title>Arcade | Jogo da Velha</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Arcade Web - AI Games</h1>
-    <div class="grid">
-        <div class="card">
-            <a href="tic-tac-toe/index.html">
-                <h3>Jogo da Velha</h3>
-                <p>Minimax Engine</p>
-            </a>
-        </div>
-        <div class="card disabled">
-            <h3>Xadrez</h3>
-            <p>Em desenvolvimento</p>
-        </div>
-        <div class="card disabled">
-            <h3>Damas</h3>
-            <p>Em desenvolvimento</p>
+    <div class="top-bar">
+        <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
+        <div class="right-icons">
+            <button id="soundBtn" class="icon-btn" title="Mutar Som"><i class="fas fa-volume-up"></i></button>
+            <button id="themeBtn" class="icon-btn" title="Trocar Tema"><i class="fas fa-moon"></i></button>
         </div>
     </div>
+
+    <div class="container">
+        <h1>Jogo da Velha</h1>
+        
+        <div class="diff-selector">
+            <button class="diff-btn" data-diff="easy">Fácil</button>
+            <button class="diff-btn" data-diff="medium">Médio</button>
+            <button class="diff-btn active" data-diff="hard">Difícil</button>
+        </div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="status-area">
+            <h2 id="status">Sua vez! (X)</h2>
+            <button id="restart">Reiniciar Partida</button>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <h2>Arcade Games</h2>
+        <ul>
+            <li><a href="#" class="active"><i class="fas fa-times"></i> Jogo da Velha</a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-knight"></i> Xadrez (Em breve)</a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> Damas (Em breve)</a></li>
+        </ul>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
