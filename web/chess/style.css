@@ -48,9 +48,10 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .diff-btn.active[data-diff="medium"] { background-color: #eab308; color: white; }
 .diff-btn.active[data-diff="hard"] { background-color: #ef4444; color: white; }
 
-/* Cronômetro */
+/* Cronômetro com Visual Híbrido */
 .timer-box {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Orbitron', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
     font-size: 2rem;
     font-weight: bold;
     background-color: var(--cell-border);
@@ -59,8 +60,11 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
     border-radius: 8px;
     margin-bottom: 20px;
     letter-spacing: 2px;
-    width: 130px;
-    text-align: center;
+    text-indent: 2px; 
+    width: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: 0.3s;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -68,6 +72,7 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .blink-yellow { animation: flashYellow 2s 3; }
 .blink-red-fast { animation: flashRed 1s infinite; }
 .flash-red-once { animation: flashRed 1s 1; }
+.rapid-blink { animation: flashRed 0.2s 5; } /* 5 piscadas bem rápidas */
 
 @keyframes flashYellow {
     0%, 100% { background-color: var(--cell-border); color: var(--text-color); }
