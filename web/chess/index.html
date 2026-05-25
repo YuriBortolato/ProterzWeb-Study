@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proterz | Xadrez IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="../index.html" class="icon-btn" title="Voltar ao Arcade"><i class="fas fa-arrow-left"></i></a>
+        <div class="right-icons">
+            <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
+            <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
+            <button id="themeBtn" class="icon-btn" title="Tema"><i class="fas fa-sun"></i></button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 id="gameTitle">Xadrez</h1>
+        
+        <div class="diff-selector">
+            <button class="diff-btn" data-diff="easy" id="txtEasy">Fácil</button>
+            <button class="diff-btn" data-diff="medium" id="txtMedium">Médio</button>
+            <button class="diff-btn active" data-diff="hard" id="txtHard">Difícil</button>
+        </div>
+
+        <div class="board-container">
+            <div id="chessboard" class="chessboard"></div>
+        </div>
+
+        <div class="status-area">
+            <h2 id="status">Sua vez! (Brancas)</h2>
+            <button id="restart">Nova Partida</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
