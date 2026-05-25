@@ -82,9 +82,13 @@ bgMusic.loop = true;
 
 // Altera a música de fundo com base na dificuldade
 function changeTrackByDifficulty() {
-    if (currentDifficulty === 'easy') bgMusic.src = 'facil.mp3';
-    else if (currentDifficulty === 'medium') bgMusic.src = 'medio.mp3';
-    else bgMusic.src = 'dificil.mp3';
+    if (currentDifficulty === 'easy') {
+        bgMusic.src = 'audio/tic-tac-toe/facil.mp3';
+    } else if (currentDifficulty === 'medium') {
+        bgMusic.src = 'audio/tic-tac-toe/medio.mp3';
+    } else {
+        bgMusic.src = 'audio/tic-tac-toe/dificil.mp3';
+    }
     
     applyVolume();
 }
@@ -116,11 +120,9 @@ soundBtn.addEventListener('click', () => {
         icon.className = 'fas fa-volume-up';
     }
     
-    // 
     applyVolume();
 });
 
-// 
 changeTrackByDifficulty();
 
 // SISTEMA DE TEMAS
