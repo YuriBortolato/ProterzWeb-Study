@@ -5,7 +5,7 @@ const texts = {
         title: 'Xadrez', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
         restart: 'Nova Partida', turnW: 'Sua vez! (Brancas)', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
-        timeout: '⏰ Tempo Esgotado!', // Texto limpo, sem emoji extra de caveira
+        timeout: '⏰ Tempo Esgotado!',
         menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas (Em breve)'
     },
     'EN': {
@@ -66,6 +66,57 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
+// SISTEMA DE PLAYLISTS DE ÁUDIO REAL
+let volumeState = 2; 
+const bgMusic = new Audio();
+let currentTrackIndex = 1;
+
+const playlists = {
+    'easy': { total: 5, path: '../audio/chess/easy/musica' },
+    'medium': { total: 3, path: '../audio/chess/medium/musica' },
+    'hard': { total: 2, path: '../audio/chess/hard/musica' }
+};
+
+function playNextTrack(forceRestart = false) {
+    const playlist = playlists[currentDifficulty];
+    if (forceRestart) currentTrackIndex = 1;
+
+    bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
+    applyVolumeSettings();
+
+    bgMusic.onended = () => {
+        currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
+        playNextTrack(false);
+    };
+}
+
+function applyVolumeSettings() {
+    if (volumeState === 2) {
+        bgMusic.volume = 1.0;
+        bgMusic.play().catch(()=>{});
+    } else if (volumeState === 1) {
+        bgMusic.volume = 0.25;
+        bgMusic.play().catch(()=>{});
+    } else {
+        bgMusic.pause();
+    }
+}
+
+soundBtn.addEventListener('click', () => {
+    const icon = soundBtn.querySelector('i');
+    if (volumeState === 2) {
+        volumeState = 1;
+        icon.className = 'fas fa-volume-down';
+    } else if (volumeState === 1) {
+        volumeState = 0;
+        icon.className = 'fas fa-volume-mute';
+    } else {
+        volumeState = 2;
+        icon.className = 'fas fa-volume-up';
+    }
+    applyVolumeSettings();
+});
+
 // LÓGICA DO RELÓGIO (TIMER)
 let timerInterval = null;
 let timerStarted = false;
@@ -89,10 +140,10 @@ function resetTimer() {
         timeSeconds = 0;
         timerEl.innerText = '00:00';
     } else if (currentDifficulty === 'medium') {
-        timeSeconds = 5 * 60; // 5 minutos
+        timeSeconds = 5 * 60; 
         timerEl.innerText = '05:00';
     } else {
-        timeSeconds = 3 * 60; // 3 minutos
+        timeSeconds = 3 * 60; 
         timerEl.innerText = '03:00';
     }
 }
@@ -106,16 +157,14 @@ function startTimer() {
 
         if (currentDifficulty === 'easy') {
             timeSeconds++;
-            if (timeSeconds >= 59 * 60 + 59) { // 59:59
+            if (timeSeconds >= 59 * 60 + 59) { 
                 timeOutLoss('59:59');
                 return;
             }
-            // Aviso 40:00
             if (timeSeconds === 40 * 60) {
                 timerEl.classList.add('blink-yellow');
                 setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
             }
-            // Aviso > 58:00
             if (timeSeconds > 58 * 60 && timeSeconds % 10 === 0) {
                 timerEl.classList.add('flash-red-once');
                 setTimeout(() => timerEl.classList.remove('flash-red-once'), 1000);
@@ -127,12 +176,10 @@ function startTimer() {
                 timeOutLoss('00:00');
                 return;
             }
-            // Aviso 01:00 (Amarelo 3x)
             if (timeSeconds === 60) {
                 timerEl.classList.add('blink-yellow');
                 setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
             }
-            // Aviso <= 00:15 (Pisca vermelho contínuo)
             if (timeSeconds === 15) {
                 timerEl.classList.add('blink-red-fast');
             }
@@ -147,10 +194,8 @@ function timeOutLoss(finalDisplay) {
     gameActive = false;
     timerEl.innerText = finalDisplay;
     
-    // Inicia a animação de piscar 5 vezes rápido
     timerEl.className = 'timer-box rapid-blink'; 
     
-    // Após 1000ms (tempo exato das 5 piscadas), fixa o visual de derrota
     setTimeout(() => {
         timerEl.className = 'timer-box'; 
         timerEl.style.backgroundColor = '#9B111E'; 
@@ -161,7 +206,7 @@ function timeOutLoss(finalDisplay) {
     statusEl.className = "status-red";
 }
 
-// IA MINIMAX 
+// IA MINIMAX
 function getPieceValue(piece) {
     if (!piece) return 0;
     const vals = { 'p': 10, 'n': 30, 'b': 30, 'r': 50, 'q': 90, 'k': 900 };
@@ -169,13 +214,6 @@ function getPieceValue(piece) {
 }
 
 function evaluateBoard(gameInst) {
-    if (gameInst.in_checkmate()) {
-        return gameInst.turn() === 'w' ? -9999 : 9999;
-    }
-    if (gameInst.in_draw() || gameInst.in_stalemate() || gameInst.in_threefold_repetition()) {
-        return 0; 
-    }
-    
     let totalEvaluation = 0;
     const b = gameInst.board();
     for (let r = 0; r < 8; r++) {
@@ -188,13 +226,15 @@ function evaluateBoard(gameInst) {
     return totalEvaluation;
 }
 
-// Minimax com Poda Alfa-Beta
 function minimax(depth, gameInst, alpha, beta, isMaximizingPlayer) {
-    if (depth === 0 || gameInst.game_over()) {
-        return evaluateBoard(gameInst);
+    const moves = gameInst.moves();
+    
+    if (moves.length === 0) {
+        if (gameInst.in_checkmate()) return isMaximizingPlayer ? -9999 : 9999;
+        return 0; 
     }
 
-    const moves = gameInst.moves();
+    if (depth === 0) return evaluateBoard(gameInst);
 
     if (isMaximizingPlayer) {
         let bestVal = -Infinity;
@@ -204,7 +244,7 @@ function minimax(depth, gameInst, alpha, beta, isMaximizingPlayer) {
             gameInst.undo();
             bestVal = Math.max(bestVal, value);
             alpha = Math.max(alpha, bestVal);
-            if (beta <= alpha) break; // Poda Alfa
+            if (beta <= alpha) break; 
         }
         return bestVal;
     } else {
@@ -223,16 +263,14 @@ function minimax(depth, gameInst, alpha, beta, isMaximizingPlayer) {
 
 function getBestMove(gameInst, depth) {
     const moves = gameInst.moves();
-    let bestValue = Infinity; // IA é o jogador minimizador (pretas), então começamos com +Infinity
+    let bestValue = Infinity; 
     let bestMove = null;
 
-    // Embaralha os movimentos para evitar sempre escolher o mesmo em situações de empate
     moves.sort(() => Math.random() - 0.5);
 
     for (let i = 0; i < moves.length; i++) {
         const move = moves[i];
         gameInst.move(move);
-        // A IA é o jogador minimizador, então queremos o valor mínimo do tabuleiro após a jogada
         let boardValue = minimax(depth - 1, gameInst, -Infinity, Infinity, true);
         gameInst.undo();
         
@@ -244,7 +282,7 @@ function getBestMove(gameInst, depth) {
     return bestMove || moves[0];
 }
 
-// LÓGICA DO XADREZ (Interface)
+// 5. MÓDULO VISUAL DO JOGO
 const boardEl = document.getElementById('chessboard');
 const statusEl = document.getElementById('status');
 const diffButtons = document.querySelectorAll('.diff-btn');
@@ -254,19 +292,19 @@ let gameActive = true;
 let currentDifficulty = 'hard';
 let selectedSquare = null;
 
+// \uFE0E força o SO (Windows/Mac) a exibir a peça como texto em vez de Emojis que quebram o Grid
 const pieceUnicode = {
-    'w': { 'p': '♙', 'n': '♘', 'b': '♗', 'r': '♖', 'q': '♕', 'k': '♔' },
-    'b': { 'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚' }
+    'w': { 'p': '♙\uFE0E', 'n': '♘\uFE0E', 'b': '♗\uFE0E', 'r': '♖\uFE0E', 'q': '♕\uFE0E', 'k': '♔\uFE0E' },
+    'b': { 'p': '♟\uFE0E', 'n': '♞\uFE0E', 'b': '♝\uFE0E', 'r': '♜\uFE0E', 'q': '♛\uFE0E', 'k': '♚\uFE0E' }
 };
 
 function renderBoard() {
     boardEl.innerHTML = ''; 
     const board = game.board(); 
+    const inCheck = game.in_check(); 
 
     for (let r = 0; r < 8; r++) {
-        for (let c = 0; r < 8; c++) {
-            if (c > 7) break;
-            
+        for (let c = 0; c < 8; c++) {
             const file = String.fromCharCode(97 + c); 
             const rank = 8 - r; 
             const squareId = file + rank;
@@ -285,7 +323,13 @@ function renderBoard() {
             }
 
             const piece = board[r][c];
-            if (piece) squareEl.innerText = pieceUnicode[piece.color][piece.type];
+            if (piece) {
+                squareEl.innerText = pieceUnicode[piece.color][piece.type];
+                
+                if (inCheck && piece.color === 'w' && piece.type === 'k') {
+                    squareEl.classList.add('king-pulse');
+                }
+            }
 
             squareEl.addEventListener('click', () => handleSquareClick(squareId));
             boardEl.appendChild(squareEl);
@@ -297,7 +341,6 @@ function renderBoard() {
 function handleSquareClick(squareId) {
     if (!gameActive || game.turn() === 'b') return; 
 
-    // Inicia o timer no primeiro clique de peça branca
     const piece = game.get(squareId);
     if (!timerStarted && piece && piece.color === 'w') {
         startTimer();
@@ -330,21 +373,15 @@ function makeAiMove() {
     if (possibleMoves.length === 0) return;
 
     let selectedMove;
-
-    // Roteamento da IA por Dificuldade
     if (currentDifficulty === 'easy') {
-        // Fácil: Escolhe aleatoriamente
         selectedMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
     } else if (currentDifficulty === 'medium') {
-        // Médio: Minimax superficial (Profundidade 2)
-        selectedMove = getBestMove(game, 2);
+        selectedMove = getBestMove(game, 1); 
     } else {
-        // Difícil: Minimax tático (Profundidade 3)
-        selectedMove = getBestMove(game, 3);
+        selectedMove = getBestMove(game, 2); 
     }
 
     game.move(selectedMove);
-    
     renderBoard();
     checkGameOver();
 }
@@ -382,7 +419,8 @@ document.getElementById('restart').addEventListener('click', () => {
     game.reset();
     gameActive = true;
     selectedSquare = null;
-    statusEl.className = "";
+    statusEl.className = ""; 
+    statusEl.innerText = texts[currentLang].turnW; 
     resetTimer();
     renderBoard();
 });
@@ -397,9 +435,11 @@ diffButtons.forEach(btn => {
         selectedSquare = null;
         statusEl.className = "";
         resetTimer();
+        playNextTrack(true); 
         renderBoard();
     });
 });
 
+playNextTrack(true);
 resetTimer();
 renderBoard();
