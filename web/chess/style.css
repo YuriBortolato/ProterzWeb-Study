@@ -5,9 +5,14 @@
     --btn-hover: #cbd5e1;
     --primary: #3b82f6;
     
+    /* Cores do Tabuleiro de Xadrez */
     --light-square: #f0d9b5;
     --dark-square: #b58863;
     --highlight: rgba(255, 255, 51, 0.5);
+    
+    /* Cor extra para o Side Menu */
+    --board-bg: #f8fafc;
+    --cell-border: #cbd5e1;
 }
 
 body.dark-mode {
@@ -17,6 +22,9 @@ body.dark-mode {
     --btn-hover: #475569;
     --light-square: #c0c0c0;
     --dark-square: #5c626b;
+    
+    --board-bg: #1e293b;
+    --cell-border: #334155;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -44,12 +52,37 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 
 .board-container { margin-bottom: 20px; border: 4px solid var(--text-color); border-radius: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 .chessboard { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 360px; height: 360px; }
-.square { display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer; user-select: none; position: relative; }
+.square { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 2.2rem; 
+    line-height: 1;    
+    cursor: pointer; 
+    user-select: none; 
+    position: relative; 
+    overflow: hidden;  
+}
 .square.light { background-color: var(--light-square); color: #000; }
 .square.dark { background-color: var(--dark-square); color: #000; }
 .square.selected { background-color: var(--highlight) !important; }
 
 .status-area { text-align: center; }
 #status { margin-bottom: 15px; font-size: 1.5rem; height: 30px; transition: 0.3s; }
+.status-green { text-decoration: underline; text-decoration-color: #22c55e; text-decoration-thickness: 4px; }
+.status-red { text-decoration: underline; text-decoration-color: #9B111E; text-decoration-thickness: 4px; }
+.status-gray { text-decoration: underline; text-decoration-color: #94a3b8; text-decoration-thickness: 4px; }
+
 #restart { padding: 12px 24px; font-size: 1.1rem; font-weight: bold; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
 #restart:hover { background-color: #2563eb; transform: translateY(-2px); }
+
+.side-menu { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: var(--board-bg); box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1000; padding: 20px; }
+.side-menu.open { left: 0; }
+.side-menu h2 { margin-bottom: 30px; color: var(--primary); border-bottom: 2px solid var(--cell-border); padding-bottom: 10px; font-size: 1.5rem;}
+.side-menu ul { list-style: none; }
+.side-menu li { margin-bottom: 15px; }
+.side-menu a { text-decoration: none; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+.side-menu a.active { color: var(--primary); font-weight: bold; }
+.side-menu li.disabled a { color: gray; cursor: not-allowed; }
+.menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; z-index: 999; }
+.menu-overlay.open { display: block; }

@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="../index.html" class="icon-btn" title="Voltar ao Arcade"><i class="fas fa-arrow-left"></i></a>
+        <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
         <div class="right-icons">
             <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
             <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
@@ -36,6 +36,16 @@
             <button id="restart">Nova Partida</button>
         </div>
     </div>
+
+    <div id="sideMenu" class="side-menu">
+        <h2 id="menuTitle">Arcade Games</h2>
+        <ul>
+            <li><a href="../index.html"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
+            <li><a href="#" class="active"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas (Em breve)</span></a></li>
+        </ul>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div>
 
     <script src="script.js"></script>
 </body>
