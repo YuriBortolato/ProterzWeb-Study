@@ -17,44 +17,35 @@ let currentDifficulty = 'hard';
 const HUMAN = 'X';
 const AI = 'O';
 
-// SISTEMA DE IDIOMA
-let currentLang = 'PT';
+// --- SISTEMA DE IDIOMA GLOBAL ---
+let currentLang = localStorage.getItem('arcadeLang') || 'PT';
 const texts = {
     'PT': {
-        title: 'Jogo da Velha',
-        easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
-        restart: 'Reiniciar Partida',
-        turn: 'Sua vez! (X)',
-        win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
-        thinking: 'IA pensando...',
-        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez (Em breve)', menuCheckers: 'Damas (Em breve)'
+        title: 'Jogo da Velha', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
+        restart: 'Reiniciar Partida', turn: 'Sua vez! (X)',
+        win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!', thinking: 'IA pensando...',
+        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas (Em breve)'
     },
     'EN': {
-        title: 'Tic Tac Toe',
-        easy: 'Easy', medium: 'Medium', hard: 'Hard',
-        restart: 'Restart Match',
-        turn: 'Your turn! (X)',
-        win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
-        thinking: 'AI thinking...',
-        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess (Soon)', menuCheckers: 'Checkers (Soon)'
+        title: 'Tic Tac Toe', easy: 'Easy', medium: 'Medium', hard: 'Hard',
+        restart: 'Restart Match', turn: 'Your turn! (X)',
+        win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!', thinking: 'AI thinking...',
+        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers (Soon)'
     },
     'ES': {
-        title: 'Tres en Raya',
-        easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
-        restart: 'Reiniciar Partida',
-        turn: '¡Tu turno! (X)',
-        win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
-        thinking: 'IA pensando...',
-        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez (Pronto)', menuCheckers: 'Damas (Pronto)'
+        title: 'Tres en Raya', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
+        restart: 'Reiniciar Partida', turn: '¡Tu turno! (X)',
+        win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!', thinking: 'IA pensando...',
+        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas (Pronto)'
     }
 };
 
+langBtn.innerText = currentLang;
+
 langBtn.addEventListener('click', () => {
-    if (currentLang === 'PT') currentLang = 'EN';
-    else if (currentLang === 'EN') currentLang = 'ES';
-    else currentLang = 'PT';
-    
+    currentLang = currentLang === 'PT' ? 'EN' : currentLang === 'EN' ? 'ES' : 'PT';
     langBtn.innerText = currentLang;
+    localStorage.setItem('arcadeLang', currentLang); // Salva globalmente
     updateLanguage();
 });
 
@@ -75,21 +66,47 @@ function updateLanguage() {
     }
 }
 
-// SISTEMA DE ÁUDIO
-let volumeState = 2; // 2 = Máximo, 1 = Médio, 0 = Mutado
+// --- SISTEMA DE TEMA GLOBAL ---
+const savedTheme = localStorage.getItem('arcadeTheme') || 'light';
+if (savedTheme === 'dark') {
+    // O body já ganha a classe no HTML, aqui só ajustamos o ícone
+    themeBtn.querySelector('i').className = 'fas fa-moon';
+} else {
+    themeBtn.querySelector('i').className = 'fas fa-sun';
+}
+
+themeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    themeBtn.querySelector('i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light'); // Salva globalmente
+});
+
+// --- SISTEMA DE ÁUDIO GLOBAL ---
+const savedVol = localStorage.getItem('arcadeVolume');
+let volumeState = savedVol !== null ? parseInt(savedVol) : 2;
+
 const bgMusic = new Audio();
 bgMusic.loop = true;
 
-// Altera a música de fundo com base na dificuldade
+function updateSoundIcon() {
+    const icon = soundBtn.querySelector('i');
+    if (volumeState === 2) icon.className = 'fas fa-volume-up';
+    else if (volumeState === 1) icon.className = 'fas fa-volume-down';
+    else icon.className = 'fas fa-volume-mute';
+}
+
 function changeTrackByDifficulty() {
-    if (currentDifficulty === 'easy') bgMusic.src = 'facil.mp3';
-    else if (currentDifficulty === 'medium') bgMusic.src = 'medio.mp3';
-    else bgMusic.src = 'dificil.mp3';
-    
+    if (currentDifficulty === 'easy') {
+        bgMusic.src = 'audio/tic-tac-toe/facil.mp3';
+    } else if (currentDifficulty === 'medium') {
+        bgMusic.src = 'audio/tic-tac-toe/medio.mp3';
+    } else {
+        bgMusic.src = 'audio/tic-tac-toe/dificil.mp3';
+    }
     applyVolume();
 }
 
-// Aplica o volume atual
 function applyVolume() {
     if (volumeState === 2) {
         bgMusic.volume = 1.0;
@@ -103,39 +120,27 @@ function applyVolume() {
 }
 
 soundBtn.addEventListener('click', () => {
-    const icon = soundBtn.querySelector('i');
+    if (volumeState === 2) volumeState = 1;
+    else if (volumeState === 1) volumeState = 0;
+    else volumeState = 2;
     
-    if (volumeState === 2) {
-        volumeState = 1;
-        icon.className = 'fas fa-volume-down';
-    } else if (volumeState === 1) {
-        volumeState = 0;
-        icon.className = 'fas fa-volume-mute';
-    } else {
-        volumeState = 2;
-        icon.className = 'fas fa-volume-up';
-    }
-    
-    // 
+    updateSoundIcon();
+    localStorage.setItem('arcadeVolume', volumeState); // Salva globalmente
     applyVolume();
 });
 
-// 
-changeTrackByDifficulty();
-
-// SISTEMA DE TEMAS
-themeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const icon = themeBtn.querySelector('i');
-    
-    if (document.body.classList.contains('dark-mode')) {
-        icon.className = 'fas fa-moon';
-    } else {
-        icon.className = 'fas fa-sun';
-    }
+// --- MENU LATERAL ---
+menuBtn.addEventListener('click', () => {
+    sideMenu.classList.add('open');
+    menuOverlay.classList.add('open');
 });
 
-// SISTEMA DE DIFICULDADE
+menuOverlay.addEventListener('click', () => {
+    sideMenu.classList.remove('open');
+    menuOverlay.classList.remove('open');
+});
+
+// --- SISTEMA DE DIFICULDADE ---
 diffButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         diffButtons.forEach(b => b.classList.remove('active'));
@@ -146,7 +151,7 @@ diffButtons.forEach(btn => {
     });
 });
 
-// LÓGICA DO JOGO
+// --- LÓGICA DO JOGO ---
 cells.forEach(cell => cell.addEventListener('click', () => {
     if (!gameActive || cell.textContent !== '') return;
     
@@ -284,12 +289,7 @@ function checkWinnerForMinimax() {
     return null;
 }
 
-menuBtn.addEventListener('click', () => {
-    sideMenu.classList.add('open');
-    menuOverlay.classList.add('open');
-});
-
-menuOverlay.addEventListener('click', () => {
-    sideMenu.classList.remove('open');
-    menuOverlay.classList.remove('open');
-});
+// Inicializações no Load
+updateLanguage();
+updateSoundIcon();
+changeTrackByDifficulty();

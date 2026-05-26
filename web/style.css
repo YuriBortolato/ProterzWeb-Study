@@ -25,7 +25,6 @@ body { background-color: var(--bg-color); color: var(--text-color); transition: 
 .icon-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-color); cursor: pointer; transition: 0.2s; padding: 10px; display: flex; align-items: center; justify-content: center; }
 .icon-btn:hover { color: var(--primary); transform: scale(1.1); }
 
-/* Novo estilo para o Botão de Idioma */
 .lang-btn {
     font-size: 1rem;
     font-weight: bold;
