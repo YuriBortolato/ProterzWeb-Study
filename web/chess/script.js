@@ -32,7 +32,7 @@ langBtn.innerText = currentLang;
 langBtn.addEventListener('click', () => {
     currentLang = currentLang === 'PT' ? 'EN' : currentLang === 'EN' ? 'ES' : 'PT';
     langBtn.innerText = currentLang;
-    localStorage.setItem('arcadeLang', currentLang); // Salva globalmente
+    localStorage.setItem('arcadeLang', currentLang); 
     updateLanguage();
 });
 
@@ -64,7 +64,7 @@ themeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     themeBtn.querySelector('i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light'); // Salva globalmente
+    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light'); 
 });
 
 // Menu Lateral
@@ -82,18 +82,21 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
-// SOM E PLAYLISTS
+// --- SOM E PLAYLISTS ---
 const soundBtn = document.getElementById('soundBtn');
 const savedVol = localStorage.getItem('arcadeVolume');
+
 let volumeState = savedVol !== null ? parseInt(savedVol) : 2;
+let targetVolume = volumeState === 2 ? 1.0 : (volumeState === 1 ? 0.25 : 0.0);
 
 const bgMusic = new Audio();
 let currentTrackIndex = 1;
 
+// Quantidade ajustada conforme seu diretório
 const playlists = {
-    'easy': { total: 5, path: '../audio/chess/easy/musica' },
-    'medium': { total: 3, path: '../audio/chess/medium/musica' },
-    'hard': { total: 2, path: '../audio/chess/hard/musica' }
+    'easy': { total: 6, path: '../audio/chess/easy/musica' },
+    'medium': { total: 4, path: '../audio/chess/medium/musica' },
+    'hard': { total: 3, path: '../audio/chess/hard/musica' }
 };
 
 function updateSoundIcon() {
@@ -103,16 +106,45 @@ function updateSoundIcon() {
     else icon.className = 'fas fa-volume-mute';
 }
 
-function applyVolumeSettings() {
-    if (volumeState === 2) {
-        bgMusic.volume = 1.0;
-        bgMusic.play().catch(()=>{});
-    } else if (volumeState === 1) {
-        bgMusic.volume = 0.25;
-        bgMusic.play().catch(()=>{});
-    } else {
-        bgMusic.pause();
+// Função de Fade In / Fade Out dinâmico
+function calculateFade() {
+    if (isNaN(bgMusic.duration)) {
+        bgMusic.volume = targetVolume;
+        return;
     }
+
+    const currentTime = bgMusic.currentTime;
+    const timeLeft = bgMusic.duration - currentTime;
+    let currentVol = targetVolume;
+
+    if (targetVolume > 0) {
+        if (currentTime < 5) {
+            // Fade-in: cresce aos poucos nos primeiros 5 segundos
+            currentVol = targetVolume * (currentTime / 5);
+        } else if (timeLeft < 10) {
+            // Fade-out: abaixa aos poucos nos últimos 10 segundos
+            currentVol = targetVolume * (timeLeft / 10);
+        }
+    }
+
+    // Garante que o volume fique entre 0 e targetVolume, e nunca ultrapasse 1.0
+    bgMusic.volume = Math.max(0, Math.min(currentVol, 1));
+}
+
+// Calcula o fade a cada atualização do tempo da música.
+bgMusic.addEventListener('timeupdate', calculateFade);
+
+function applyVolumeSettings() {
+    if (volumeState === 2) targetVolume = 1.0;
+    else if (volumeState === 1) targetVolume = 0.25;
+    else targetVolume = 0.0;
+    
+    // Se a música estiver pausada, tenta tocar. Se não puder ignora o erro e deixa pausada.
+    if (bgMusic.paused) {
+        bgMusic.play().catch(()=>{});
+    }
+    
+    calculateFade();
 }
 
 soundBtn.addEventListener('click', () => {
@@ -121,7 +153,7 @@ soundBtn.addEventListener('click', () => {
     else volumeState = 2;
     
     updateSoundIcon();
-    localStorage.setItem('arcadeVolume', volumeState); // Salva globalmente
+    localStorage.setItem('arcadeVolume', volumeState); 
     applyVolumeSettings();
 });
 
@@ -130,14 +162,16 @@ function playNextTrack(forceRestart = false) {
     if (forceRestart) currentTrackIndex = 1;
 
     bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
+    bgMusic.currentTime = 0; 
     applyVolumeSettings();
-
-    bgMusic.onended = () => {
-        currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
-        playNextTrack(false);
-    };
 }
 
+// Quando a música atual terminar, toca a próxima da playlist. Se chegar no fim, volta pro início.
+bgMusic.onended = () => {
+    const playlist = playlists[currentDifficulty];
+    currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
+    playNextTrack(false);
+};
 
 // LÓGICA DO RELÓGIO (TIMER)
 let timerInterval = null;
@@ -436,6 +470,7 @@ function updateStatus() {
     }
 }
 
+// Eventos dos Botões
 document.getElementById('restart').addEventListener('click', () => {
     game.reset();
     gameActive = true;
@@ -456,6 +491,8 @@ diffButtons.forEach(btn => {
         selectedSquare = null;
         statusEl.className = "";
         resetTimer();
+        
+        // Reinicia a música da nova dificuldade imediatamente
         playNextTrack(true); 
         renderBoard();
     });
