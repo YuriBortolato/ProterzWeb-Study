@@ -1,5 +1,7 @@
-// SISTEMA DE UI (Idioma, Tema, Som, Menu)
-let currentLang = 'PT';
+// --- SISTEMA DE UI GLOBAL (Idioma, Tema, Som, Menu) ---
+
+// IDIOMA
+let currentLang = localStorage.getItem('arcadeLang') || 'PT';
 const texts = {
     'PT': {
         title: 'Xadrez', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
@@ -25,9 +27,12 @@ const texts = {
 };
 
 const langBtn = document.getElementById('langBtn');
+langBtn.innerText = currentLang;
+
 langBtn.addEventListener('click', () => {
     currentLang = currentLang === 'PT' ? 'EN' : currentLang === 'EN' ? 'ES' : 'PT';
     langBtn.innerText = currentLang;
+    localStorage.setItem('arcadeLang', currentLang); // Salva globalmente
     updateLanguage();
 });
 
@@ -45,10 +50,21 @@ function updateLanguage() {
     updateStatus();
 }
 
+// TEMA
 const themeBtn = document.getElementById('themeBtn');
+const savedTheme = localStorage.getItem('arcadeTheme') || 'light';
+
+if (savedTheme === 'dark') {
+    themeBtn.querySelector('i').className = 'fas fa-moon';
+} else {
+    themeBtn.querySelector('i').className = 'fas fa-sun';
+}
+
 themeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-    themeBtn.querySelector('i').className = document.body.classList.contains('dark-mode') ? 'fas fa-moon' : 'fas fa-sun';
+    const isDark = document.body.classList.contains('dark-mode');
+    themeBtn.querySelector('i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light'); // Salva globalmente
 });
 
 // Menu Lateral
@@ -66,8 +82,11 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
-// SISTEMA DE PLAYLISTS DE ÁUDIO REAL
-let volumeState = 2; 
+// SOM E PLAYLISTS
+const soundBtn = document.getElementById('soundBtn');
+const savedVol = localStorage.getItem('arcadeVolume');
+let volumeState = savedVol !== null ? parseInt(savedVol) : 2;
+
 const bgMusic = new Audio();
 let currentTrackIndex = 1;
 
@@ -77,17 +96,11 @@ const playlists = {
     'hard': { total: 2, path: '../audio/chess/hard/musica' }
 };
 
-function playNextTrack(forceRestart = false) {
-    const playlist = playlists[currentDifficulty];
-    if (forceRestart) currentTrackIndex = 1;
-
-    bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
-    applyVolumeSettings();
-
-    bgMusic.onended = () => {
-        currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
-        playNextTrack(false);
-    };
+function updateSoundIcon() {
+    const icon = soundBtn.querySelector('i');
+    if (volumeState === 2) icon.className = 'fas fa-volume-up';
+    else if (volumeState === 1) icon.className = 'fas fa-volume-down';
+    else icon.className = 'fas fa-volume-mute';
 }
 
 function applyVolumeSettings() {
@@ -103,19 +116,28 @@ function applyVolumeSettings() {
 }
 
 soundBtn.addEventListener('click', () => {
-    const icon = soundBtn.querySelector('i');
-    if (volumeState === 2) {
-        volumeState = 1;
-        icon.className = 'fas fa-volume-down';
-    } else if (volumeState === 1) {
-        volumeState = 0;
-        icon.className = 'fas fa-volume-mute';
-    } else {
-        volumeState = 2;
-        icon.className = 'fas fa-volume-up';
-    }
+    if (volumeState === 2) volumeState = 1;
+    else if (volumeState === 1) volumeState = 0;
+    else volumeState = 2;
+    
+    updateSoundIcon();
+    localStorage.setItem('arcadeVolume', volumeState); // Salva globalmente
     applyVolumeSettings();
 });
+
+function playNextTrack(forceRestart = false) {
+    const playlist = playlists[currentDifficulty];
+    if (forceRestart) currentTrackIndex = 1;
+
+    bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
+    applyVolumeSettings();
+
+    bgMusic.onended = () => {
+        currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
+        playNextTrack(false);
+    };
+}
+
 
 // LÓGICA DO RELÓGIO (TIMER)
 let timerInterval = null;
@@ -282,7 +304,7 @@ function getBestMove(gameInst, depth) {
     return bestMove || moves[0];
 }
 
-// 5. MÓDULO VISUAL DO JOGO
+// MÓDULO VISUAL DO JOGO
 const boardEl = document.getElementById('chessboard');
 const statusEl = document.getElementById('status');
 const diffButtons = document.querySelectorAll('.diff-btn');
@@ -292,7 +314,6 @@ let gameActive = true;
 let currentDifficulty = 'hard';
 let selectedSquare = null;
 
-// \uFE0E força o SO (Windows/Mac) a exibir a peça como texto em vez de Emojis que quebram o Grid
 const pieceUnicode = {
     'w': { 'p': '♙\uFE0E', 'n': '♘\uFE0E', 'b': '♗\uFE0E', 'r': '♖\uFE0E', 'q': '♕\uFE0E', 'k': '♔\uFE0E' },
     'b': { 'p': '♟\uFE0E', 'n': '♞\uFE0E', 'b': '♝\uFE0E', 'r': '♜\uFE0E', 'q': '♛\uFE0E', 'k': '♚\uFE0E' }
@@ -440,6 +461,9 @@ diffButtons.forEach(btn => {
     });
 });
 
+// Inicializações no Load
+updateLanguage();
+updateSoundIcon();
 playNextTrack(true);
 resetTimer();
 renderBoard();

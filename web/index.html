@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <script>
+        if (localStorage.getItem('arcadeTheme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
     <div class="top-bar">
         <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
         <div class="right-icons">
@@ -52,7 +58,7 @@
             <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas (Em breve)</span></a></li>
         </ul>
     </div>
-    <div id="menuOverlay" class="menu-overlay"></div>
+    <div id="menuOverlay" class="menu-overlay"></div> 
 
     <script src="script.js"></script>
 </body>
