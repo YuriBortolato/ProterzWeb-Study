@@ -338,10 +338,17 @@ function applyMove(board, move, playerColor) {
 function renderBoard() {
     boardEl.innerHTML = '';
     
-    let allPlayerMoves = getPossibleMoves(boardState, currentTurn);
-    if (allPlayerMoves.length === 0) {
-        handleGameOver(currentTurn === 'w' ? 'b' : 'w');
-        return;
+    let allPlayerMoves = [];
+    let hasMandatoryCapture = false;
+
+    // Verifica se o jogador tem movimentos disponíveis e se há captura obrigatória
+    if (gameActive) {
+        allPlayerMoves = getPossibleMoves(boardState, currentTurn);
+        if (allPlayerMoves.length === 0) {
+            handleGameOver(currentTurn === 'w' ? 'b' : 'w');
+        } else if (allPlayerMoves[0].jump) {
+            hasMandatoryCapture = true; // Se o primeiro movimento listado tiver um salto, a captura é obrigatória
+        }
     }
 
     for (let r = 0; r < 8; r++) {
@@ -368,6 +375,15 @@ function renderBoard() {
                     const pieceEl = document.createElement('div');
                     pieceEl.className = `checker-piece ${piece.toLowerCase() === 'w' ? 'checker-w' : 'checker-b'}`;
                     if (piece === 'W' || piece === 'B') pieceEl.classList.add('checker-king');
+                    
+                    // Animação de alerta para peças que têm captura obrigatória
+                    if (gameActive && currentTurn === 'w' && piece.toLowerCase() === 'w' && hasMandatoryCapture) {
+                        let canThisPieceCapture = allPlayerMoves.some(m => m.from.r === r && m.from.c === c);
+                        if (canThisPieceCapture) {
+                            pieceEl.classList.add('pulse-alert');
+                        }
+                    }
+
                     squareEl.appendChild(pieceEl);
                 }
 
