@@ -108,7 +108,7 @@ function updateSoundIcon() {
 
 function calculateFade() {
     if (isNaN(bgMusic.duration)) {
-        bgMusic.volume = targetVolume;
+        bgMusic.volume = 0; 
         return;
     }
 

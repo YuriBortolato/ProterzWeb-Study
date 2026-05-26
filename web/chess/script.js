@@ -107,7 +107,7 @@ function updateSoundIcon() {
 
 function calculateFade() {
     if (isNaN(bgMusic.duration)) {
-        bgMusic.volume = targetVolume;
+        bgMusic.volume = 0; 
         return;
     }
 
@@ -152,6 +152,7 @@ function playNextTrack(forceRestart = false) {
     const playlist = playlists[currentDifficulty];
     if (forceRestart) currentTrackIndex = 1;
 
+    bgMusic.volume = 0; // Fix: previne o "estouro" zerando o volume antes de trocar a fonte
     bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
     bgMusic.currentTime = 0; 
     applyVolumeSettings();
