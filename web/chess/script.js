@@ -8,21 +8,21 @@ const texts = {
         restart: 'Nova Partida', turnW: 'Sua vez! (Brancas)', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
         timeout: '⏰ Tempo Esgotado!',
-        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas (Em breve)'
+        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
     },
     'EN': {
         title: 'Chess', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'New Game', turnW: 'Your turn! (White)', turnB: 'AI thinking...',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
         timeout: '⏰ Time Out!',
-        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers (Soon)'
+        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
     },
     'ES': {
         title: 'Ajedrez', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Nueva Partida', turnW: '¡Tu turno! (Blancas)', turnB: 'IA pensando...',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
         timeout: '⏰ ¡Tiempo Agotado!',
-        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas (Pronto)'
+        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
     }
 };
 
@@ -92,7 +92,6 @@ let targetVolume = volumeState === 2 ? 1.0 : (volumeState === 1 ? 0.25 : 0.0);
 const bgMusic = new Audio();
 let currentTrackIndex = 1;
 
-// Quantidade ajustada conforme seu diretório
 const playlists = {
     'easy': { total: 6, path: '../audio/chess/easy/musica' },
     'medium': { total: 4, path: '../audio/chess/medium/musica' },
@@ -106,7 +105,6 @@ function updateSoundIcon() {
     else icon.className = 'fas fa-volume-mute';
 }
 
-// Função de Fade In / Fade Out dinâmico
 function calculateFade() {
     if (isNaN(bgMusic.duration)) {
         bgMusic.volume = targetVolume;
@@ -119,19 +117,14 @@ function calculateFade() {
 
     if (targetVolume > 0) {
         if (currentTime < 5) {
-            // Fade-in: cresce aos poucos nos primeiros 5 segundos
             currentVol = targetVolume * (currentTime / 5);
         } else if (timeLeft < 10) {
-            // Fade-out: abaixa aos poucos nos últimos 10 segundos
             currentVol = targetVolume * (timeLeft / 10);
         }
     }
-
-    // Garante que o volume fique entre 0 e targetVolume, e nunca ultrapasse 1.0
     bgMusic.volume = Math.max(0, Math.min(currentVol, 1));
 }
 
-// Calcula o fade a cada atualização do tempo da música.
 bgMusic.addEventListener('timeupdate', calculateFade);
 
 function applyVolumeSettings() {
@@ -139,11 +132,9 @@ function applyVolumeSettings() {
     else if (volumeState === 1) targetVolume = 0.25;
     else targetVolume = 0.0;
     
-    // Se a música estiver pausada, tenta tocar. Se não puder ignora o erro e deixa pausada.
     if (bgMusic.paused) {
         bgMusic.play().catch(()=>{});
     }
-    
     calculateFade();
 }
 
@@ -166,7 +157,6 @@ function playNextTrack(forceRestart = false) {
     applyVolumeSettings();
 }
 
-// Quando a música atual terminar, toca a próxima da playlist. Se chegar no fim, volta pro início.
 bgMusic.onended = () => {
     const playlist = playlists[currentDifficulty];
     currentTrackIndex = currentTrackIndex >= playlist.total ? 1 : currentTrackIndex + 1;
@@ -470,7 +460,6 @@ function updateStatus() {
     }
 }
 
-// Eventos dos Botões
 document.getElementById('restart').addEventListener('click', () => {
     game.reset();
     gameActive = true;
@@ -491,8 +480,6 @@ diffButtons.forEach(btn => {
         selectedSquare = null;
         statusEl.className = "";
         resetTimer();
-        
-        // Reinicia a música da nova dificuldade imediatamente
         playNextTrack(true); 
         renderBoard();
     });

@@ -24,19 +24,19 @@ const texts = {
         title: 'Jogo da Velha', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: 'Sua vez! (X)',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas (Em breve)'
+        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
     },
     'EN': {
         title: 'Tic Tac Toe', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'Restart Match', turn: 'Your turn! (X)',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!', thinking: 'AI thinking...',
-        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers (Soon)'
+        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
     },
     'ES': {
         title: 'Tres en Raya', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: '¡Tu turno! (X)',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas (Pronto)'
+        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
     }
 };
 
@@ -45,7 +45,7 @@ langBtn.innerText = currentLang;
 langBtn.addEventListener('click', () => {
     currentLang = currentLang === 'PT' ? 'EN' : currentLang === 'EN' ? 'ES' : 'PT';
     langBtn.innerText = currentLang;
-    localStorage.setItem('arcadeLang', currentLang); // Salva globalmente
+    localStorage.setItem('arcadeLang', currentLang); 
     updateLanguage();
 });
 
@@ -69,7 +69,6 @@ function updateLanguage() {
 // --- SISTEMA DE TEMA GLOBAL ---
 const savedTheme = localStorage.getItem('arcadeTheme') || 'light';
 if (savedTheme === 'dark') {
-    // O body já ganha a classe no HTML, aqui só ajustamos o ícone
     themeBtn.querySelector('i').className = 'fas fa-moon';
 } else {
     themeBtn.querySelector('i').className = 'fas fa-sun';
@@ -79,7 +78,7 @@ themeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     themeBtn.querySelector('i').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light'); // Salva globalmente
+    localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light');
 });
 
 // --- SISTEMA DE ÁUDIO GLOBAL ---
@@ -125,7 +124,7 @@ soundBtn.addEventListener('click', () => {
     else volumeState = 2;
     
     updateSoundIcon();
-    localStorage.setItem('arcadeVolume', volumeState); // Salva globalmente
+    localStorage.setItem('arcadeVolume', volumeState); 
     applyVolume();
 });
 
