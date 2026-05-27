@@ -171,8 +171,6 @@ function resetTimer() {
     clearInterval(timerInterval);
     timerStarted = false;
     timerEl.className = 'timer-box'; 
-    timerEl.style.backgroundColor = '';
-    timerEl.style.color = '';
 
     if (currentDifficulty === 'easy') {
         timeSeconds = 0;
@@ -215,7 +213,6 @@ function startTimer() {
                 return;
             }
             
-            // Disparo dinâmico do alerta amarelo dependendo da dificuldade
             let yellowAlertTime = currentDifficulty === 'medium' ? 60 : 45;
             
             if (timeSeconds === yellowAlertTime) {
@@ -239,9 +236,7 @@ function timeOutLoss(finalDisplay) {
     timerEl.className = 'timer-box rapid-blink'; 
     
     setTimeout(() => {
-        timerEl.className = 'timer-box'; 
-        timerEl.style.backgroundColor = '#9B111E'; 
-        timerEl.style.color = 'white';
+        timerEl.className = 'timer-box timeout-red'; 
     }, 1000);
 
     statusEl.innerText = texts[currentLang].timeout; 
@@ -305,7 +300,6 @@ function getValidMoves(pos) {
     return moves;
 }
 
-// Verifica se colocar muro é válido. Impede completamente sobreposições!
 function isWallLegal(r, c, type) {
     if (type === 'H') {
         if (c + 2 >= 17 || gridState[r][c] !== 0 || gridState[r][c+1] !== 0 || gridState[r][c+2] !== 0) return false;
@@ -334,7 +328,6 @@ function placeWall(r, c, type, isP1) {
     else { gridState[r+1][c] = 1; gridState[r+2][c] = 1; }
 }
 
-// BFS - Retorna a ROTA INTEIRA (usada pela IA para previsão do futuro)
 function getShortestPath(startPos, targetRow) {
     let queue = [{ r: startPos.r, c: startPos.c, path: [] }];
     let visited = Array(17).fill().map(() => Array(17).fill(false));
@@ -355,7 +348,6 @@ function getShortestPath(startPos, targetRow) {
     return null; 
 }
 
-// Highlight Lógico das Paredes (Preenche a linha reta completa)
 function highlightWall(r, c, type, isHover) {
     const ids = type === 'H' ? [`cell-${r}-${c}`, `cell-${r}-${c+1}`, `cell-${r}-${c+2}`] : [`cell-${r}-${c}`, `cell-${r+1}-${c}`, `cell-${r+2}-${c}`];
     ids.forEach(id => {
@@ -376,14 +368,13 @@ function renderBoard() {
             const el = document.createElement('div');
             el.id = `cell-${r}-${c}`;
             
-            // Células (Peões)
             if (r % 2 === 0 && c % 2 === 0) {
                 el.className = 'cell';
                 let isTargetMove = validMoves.some(m => m.r === r && m.c === c);
                 if (isTargetMove) {
                     el.classList.add('valid-move');
                     el.addEventListener('click', () => {
-                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        if (!timerStarted) startTimer();
                         movePlayerTo(r, c);
                     });
                 }
@@ -398,7 +389,6 @@ function renderBoard() {
                     el.appendChild(pawn);
                 }
             } 
-            // Muros Horizontais
             else if (r % 2 !== 0 && c % 2 === 0) {
                 el.className = 'wall-h';
                 if (gridState[r][c] === 1) el.classList.add('wall-placed');
@@ -406,12 +396,11 @@ function renderBoard() {
                     el.addEventListener('mouseover', () => highlightWall(r, c, 'H', true));
                     el.addEventListener('mouseout', () => highlightWall(r, c, 'H', false));
                     el.addEventListener('click', () => { 
-                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        if (!timerStarted) startTimer();
                         placeWall(r, c, 'H', true); switchTurn(); 
                     });
                 }
             }
-            // Muros Verticais
             else if (r % 2 === 0 && c % 2 !== 0) {
                 el.className = 'wall-v';
                 if (gridState[r][c] === 1) el.classList.add('wall-placed');
@@ -419,12 +408,11 @@ function renderBoard() {
                     el.addEventListener('mouseover', () => highlightWall(r, c, 'V', true));
                     el.addEventListener('mouseout', () => highlightWall(r, c, 'V', false));
                     el.addEventListener('click', () => { 
-                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        if (!timerStarted) startTimer();
                         placeWall(r, c, 'V', true); switchTurn(); 
                     });
                 }
             }
-            // Interseções
             else {
                 el.className = 'intersection';
                 if (gridState[r][c] === 1) el.classList.add('wall-placed');
@@ -454,7 +442,6 @@ function switchTurn() {
     }
 }
 
-// IA com Simulação de Movimentos e Avaliação de Paredes
 function makeAiMove() {
     if (!gameActive) return;
 
@@ -467,7 +454,6 @@ function makeAiMove() {
     let p1Dist = p1Path ? p1Path.length : Infinity;
     let p2Dist = p2Path ? p2Path.length : Infinity;
 
-    // Simula cada movimento possível do jogador e avalia o impacto na distância da IA até a vitória. Quanto mais próximo o jogador estiver de vencer, mais urgente é bloquear ou avançar.
     let moves = getValidMoves(p2Pos);
     for (let m of moves) {
         let oldPos = p2Pos; p2Pos = m;
@@ -485,17 +471,13 @@ function makeAiMove() {
         }
     }
 
-    // Se a IA tiver paredes, e o jogador estiver em um caminho claro para vencer, tente colocar uma parede que bloqueie ou atrase o jogador. A IA analisa os próximos passos do jogador e tenta colocar paredes que forcem o jogador a desviar.
     if (p2Walls > 0 && currentDifficulty !== 'easy' && p1Path && p1Path.length > 0) {
-        
         let wallCandidates = [];
-        // Analisa os próximos 4 passos exatos que o jogador quer dar
         let stepsToBlock = p1Path.slice(0, 4);
         stepsToBlock.push(p1Pos); 
         
         for (let step of stepsToBlock) {
             let r = step.r, c = step.c;
-            // Gera potenciais paredes ao redor do passo do jogador (tanto horizontais quanto verticais)
             let potentialWalls = [
                 {r: r-1, c: c, dir: 'H'}, {r: r-1, c: c-2, dir: 'H'},
                 {r: r+1, c: c, dir: 'H'}, {r: r+1, c: c-2, dir: 'H'},
@@ -509,7 +491,6 @@ function makeAiMove() {
             }
         }
 
-        // Remove duplicatas exatas (muitas paredes podem ser sugeridas múltiplas vezes)
         let uniqueWalls = wallCandidates.filter((v, i, a) => a.findIndex(t => (t.r === v.r && t.c === v.c && t.dir === v.dir)) === i);
 
         for (let cand of uniqueWalls) {
@@ -520,7 +501,6 @@ function makeAiMove() {
                 let newP1Path = getShortestPath(p1Pos, 0);
                 let newP2Path = getShortestPath(p2Pos, 16);
                 
-                // Reverte a parede para não afetar as simulações seguintes
                 gridState[rCheck][cCheck] = 0;
                 if (dir === 'H') { gridState[rCheck][cCheck+1] = 0; gridState[rCheck][cCheck+2] = 0; }
                 else { gridState[rCheck+1][cCheck] = 0; gridState[rCheck+2][cCheck] = 0; }
@@ -531,7 +511,6 @@ function makeAiMove() {
                     let newP2Dist = newP2Path.length;
                     let score = (newP1Dist - newP2Dist);
                     
-                    // No difícil, prioriza MUITO bloquear o caminho do jogador. No médio, é um fator aleatório.
                     if (currentDifficulty === 'hard') {
                         score += (newP1Dist - p1Dist) * 2; 
                     } else {
