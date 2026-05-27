@@ -92,11 +92,11 @@ let targetVolume = volumeState === 2 ? 1.0 : (volumeState === 1 ? 0.25 : 0.0);
 const bgMusic = new Audio();
 let currentTrackIndex = 1;
 
-// Ajuste os diretórios de música conforme as pastas de áudio de damas
+// Ajuste os diretórios de música para puxar da pasta do Xadrez temporariamente
 const playlists = {
-    'easy': { total: 6, path: '../audio/checkers/easy/musica' },
-    'medium': { total: 4, path: '../audio/checkers/medium/musica' },
-    'hard': { total: 3, path: '../audio/checkers/hard/musica' }
+    'easy': { total: 6, path: '../audio/chess/easy/musica' },
+    'medium': { total: 4, path: '../audio/chess/medium/musica' },
+    'hard': { total: 3, path: '../audio/chess/hard/musica' }
 };
 
 function updateSoundIcon() {
