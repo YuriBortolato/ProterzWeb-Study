@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proterz</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('arcadeTheme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
+    <div class="top-bar">
+        <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
+        <div class="right-icons">
+            <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
+            <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
+            <button id="themeBtn" class="icon-btn" title="Tema"><i class="fas fa-sun"></i></button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 id="gameTitle">Barricade</h1>
+        
+        <div class="diff-selector">
+            <button class="diff-btn" data-diff="easy" id="txtEasy">Fácil</button>
+            <button class="diff-btn" data-diff="medium" id="txtMedium">Médio</button>
+            <button class="diff-btn active" data-diff="hard" id="txtHard">Difícil</button>
+        </div>
+
+        <div class="game-layout">
+            <div class="board-column">
+                <div id="playerTimer" class="timer-box">03:00</div>
+                <div class="board-container">
+                    <div id="barricadeboard" class="interlock-grid"></div>
+                </div>
+            </div>
+            
+            <div class="hud-column">
+                <div class="player-card ai-card">
+                    <h3>IA (Azul)</h3>
+                    <p>Barricadas: <span id="aiWalls">10</span>/10</p>
+                </div>
+                <div class="player-card human-card">
+                    <h3>Você (Vermelho)</h3>
+                    <p>Barricadas: <span id="humanWalls">10</span>/10</p>
+                </div>
+                <div class="status-area">
+                    <h2 id="status">Sua vez!</h2>
+                    <button id="restart">Nova Partida</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <h2 id="menuTitle">Proterz</h2>
+        <ul>
+            <li><a href="../"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
+            <li><a href="../chess/"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
+            <li><a href="../checkers/"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas</span></a></li>
+            <li><a href="#" class="active"><i class="fas fa-bars"></i> <span id="menuBarricade">Barricade</span></a></li>
+        </ul>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
