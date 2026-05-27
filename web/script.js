@@ -13,6 +13,7 @@ const menuOverlay = document.getElementById('menuOverlay');
 
 let board = Array(9).fill('');
 let gameActive = true;
+let isAiThinking = false;
 let currentDifficulty = 'hard';
 const HUMAN = 'X';
 const AI = 'O';
@@ -153,7 +154,8 @@ diffButtons.forEach(btn => {
 
 // --- LÓGICA DO JOGO ---
 cells.forEach(cell => cell.addEventListener('click', () => {
-    if (!gameActive || cell.textContent !== '') return;
+    // BLOQUEIA CLIQUES SE O JOGO NÃO ESTIVER ATIVO, SE A CÉLULA ESTIVER PREENCHIDA OU SE A IA ESTIVER PENSANDO
+    if (!gameActive || cell.textContent !== '' || isAiThinking) return;
     
     if (volumeState > 0 && bgMusic.paused) bgMusic.play().catch(()=>{});
 
@@ -161,8 +163,12 @@ cells.forEach(cell => cell.addEventListener('click', () => {
     makeMove(index, HUMAN);
 
     if (gameActive) {
+        isAiThinking = true; // BLOQUEIA CLIQUES ENQUANTO A IA ESTÁ PENSANDO
         statusText.innerText = texts[currentLang].thinking;
-        setTimeout(makeAiMove, 400);
+        setTimeout(() => {
+            makeAiMove();
+            isAiThinking = false; // DESBLOQUEIA CLIQUES APÓS A IA JOGAR
+        }, 400);
     }
 }));
 
