@@ -8,21 +8,21 @@ const texts = {
         restart: 'Nova Partida', turnW: 'Sua vez! (Brancas)', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
         timeout: '⏰ Tempo Esgotado!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
     },
     'EN': {
         title: 'Chess', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'New Game', turnW: 'Your turn! (White)', turnB: 'AI thinking...',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
         timeout: '⏰ Time Out!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
+        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade'
     },
     'ES': {
         title: 'Ajedrez', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Nueva Partida', turnW: '¡Tu turno! (Blancas)', turnB: 'IA pensando...',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
         timeout: '⏰ ¡Tiempo Agotado!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
     }
 };
 
@@ -47,6 +47,7 @@ function updateLanguage() {
     document.getElementById('menuTicTac').innerText = t.menuTicTac;
     document.getElementById('menuChess').innerText = t.menuChess;
     document.getElementById('menuCheckers').innerText = t.menuCheckers;
+    document.getElementById('menuBarricade').innerText = t.menuBarricade;
     updateStatus();
 }
 
@@ -152,7 +153,7 @@ function playNextTrack(forceRestart = false) {
     const playlist = playlists[currentDifficulty];
     if (forceRestart) currentTrackIndex = 1;
 
-    bgMusic.volume = 0; // Fix: previne o "estouro" zerando o volume antes de trocar a fonte
+    bgMusic.volume = 0;
     bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
     bgMusic.currentTime = 0; 
     applyVolumeSettings();
