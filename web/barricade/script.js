@@ -178,11 +178,11 @@ function resetTimer() {
         timeSeconds = 0;
         timerEl.innerText = '00:00';
     } else if (currentDifficulty === 'medium') {
-        timeSeconds = 5 * 60; 
-        timerEl.innerText = '05:00';
+        timeSeconds = 2 * 60; // 2 minutos
+        timerEl.innerText = '02:00';
     } else {
-        timeSeconds = 3 * 60; 
-        timerEl.innerText = '03:00';
+        timeSeconds = 80; // 1 minuto e 20 segundos
+        timerEl.innerText = '01:20';
     }
 }
 
@@ -201,7 +201,7 @@ function startTimer() {
             }
             if (timeSeconds === 40 * 60) {
                 timerEl.classList.add('blink-yellow');
-                setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
+                setTimeout(() => timerEl.classList.remove('blink-yellow'), 5000);
             }
             if (timeSeconds > 58 * 60 && timeSeconds % 10 === 0) {
                 timerEl.classList.add('flash-red-once');
@@ -214,12 +214,17 @@ function startTimer() {
                 timeOutLoss('00:00');
                 return;
             }
-            if (timeSeconds === 60) {
+            
+            // Disparo dinâmico do alerta amarelo dependendo da dificuldade
+            let yellowAlertTime = currentDifficulty === 'medium' ? 60 : 45;
+            
+            if (timeSeconds === yellowAlertTime) {
                 timerEl.classList.add('blink-yellow');
-                setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
+                setTimeout(() => timerEl.classList.remove('blink-yellow'), 5000); 
             }
+            
             if (timeSeconds === 15) {
-                timerEl.classList.add('blink-red-fast');
+                timerEl.classList.add('blink-red-fast'); 
             }
         }
         
