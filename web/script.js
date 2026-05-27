@@ -24,19 +24,19 @@ const texts = {
         title: 'Jogo da Velha', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: 'Sua vez! (X)',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
     },
     'EN': {
         title: 'Tic Tac Toe', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'Restart Match', turn: 'Your turn! (X)',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!', thinking: 'AI thinking...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
+        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade'
     },
     'ES': {
         title: 'Tres en Raya', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: '¡Tu turno! (X)',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
     }
 };
 
@@ -60,6 +60,7 @@ function updateLanguage() {
     document.getElementById('menuTicTac').innerText = t.menuTicTac;
     document.getElementById('menuChess').innerText = t.menuChess;
     document.getElementById('menuCheckers').innerText = t.menuCheckers;
+    document.getElementById('menuBarricade').innerText = t.menuBarricade;
     
     if (gameActive && statusText.innerText.includes('(X)')) {
         statusText.innerText = t.turn;
