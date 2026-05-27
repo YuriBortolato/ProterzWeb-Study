@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proterz | Arcade IA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('arcadeTheme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+
+    <div class="top-bar">
+        <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
+        <div class="right-icons">
+            <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
+            <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
+            <button id="themeBtn" class="icon-btn" title="Tema"><i class="fas fa-sun"></i></button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 id="gameTitle">Jogo da Velha</h1>
+        
+        <div class="diff-selector">
+            <button class="diff-btn" data-diff="easy" id="txtEasy">Fácil</button>
+            <button class="diff-btn" data-diff="medium" id="txtMedium">Médio</button>
+            <button class="diff-btn active" data-diff="hard" id="txtHard">Difícil</button>
+        </div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="status-area">
+            <h2 id="status">Sua vez! (X)</h2>
+            <button id="restart">Reiniciar Partida</button>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <h2 id="menuTitle">Arcade Games</h2>
+        <ul>
+            <li><a href="#" class="active"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
+            <li><a href="chess/index.html"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
+            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas (Em breve)</span></a></li>
+        </ul>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div> 
+
+    <script src="script.js"></script>
+</body>
+</html>
