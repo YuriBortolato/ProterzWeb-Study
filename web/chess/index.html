@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proterz | Xadrez IA</title>
+    <title>Proterz</title>
+    <link rel="icon" type="image/png" href="../favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-</head>
+    </head>
 <body>
     <script>
         if (localStorage.getItem('arcadeTheme') === 'dark') {
@@ -51,7 +52,7 @@
         <ul>
             <li><a href="../index.html"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
             <li><a href="#" class="active"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
-            <li class="disabled"><a href="#"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas (Em breve)</span></a></li>
+            <li><a href="../checkers/index.html"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas</span></a></li>
         </ul>
     </div>
     <div id="menuOverlay" class="menu-overlay"></div>

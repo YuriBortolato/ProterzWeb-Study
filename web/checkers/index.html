@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proterz</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" href="../favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    </head>
 <body>
     <script>
         if (localStorage.getItem('arcadeTheme') === 'dark') {
@@ -25,7 +26,7 @@
     </div>
 
     <div class="container">
-        <h1 id="gameTitle">Jogo da Velha</h1>
+        <h1 id="gameTitle">Damas</h1>
         
         <div class="diff-selector">
             <button class="diff-btn" data-diff="easy" id="txtEasy">Fácil</button>
@@ -33,33 +34,27 @@
             <button class="diff-btn active" data-diff="hard" id="txtHard">Difícil</button>
         </div>
 
-        <div class="board" id="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
+        <div id="playerTimer" class="timer-box">03:00</div>
+
+        <div class="board-container">
+            <div id="checkersboard" class="chessboard"></div>
         </div>
 
         <div class="status-area">
-            <h2 id="status">Sua vez! (X)</h2>
-            <button id="restart">Reiniciar Partida</button>
+            <h2 id="status">Sua vez! (Vermelhas)</h2>
+            <button id="restart">Nova Partida</button>
         </div>
     </div>
 
     <div id="sideMenu" class="side-menu">
         <h2 id="menuTitle">Arcade Games</h2>
         <ul>
-            <li><a href="#" class="active"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
-            <li><a href="chess/index.html"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
-            <li><a href="checkers/index.html"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas</span></a></li>
+            <li><a href="../index.html"><i class="fas fa-times"></i> <span id="menuTicTac">Jogo da Velha</span></a></li>
+            <li><a href="../chess/index.html"><i class="fas fa-chess-knight"></i> <span id="menuChess">Xadrez</span></a></li>
+            <li><a href="#" class="active"><i class="fas fa-chess-board"></i> <span id="menuCheckers">Damas</span></a></li>
         </ul>
     </div>
-    <div id="menuOverlay" class="menu-overlay"></div> 
+    <div id="menuOverlay" class="menu-overlay"></div>
 
     <script src="script.js"></script>
 </body>
