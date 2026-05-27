@@ -8,21 +8,21 @@ const texts = {
         restart: 'Nova Partida', turnW: 'Sua vez! (Vermelhas)', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
         timeout: '⏰ Tempo Esgotado!',
-        menuTitle: 'Arcade Games', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz Arcade', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
     },
     'EN': {
         title: 'Checkers', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'New Game', turnW: 'Your turn! (Red)', turnB: 'AI thinking...',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
         timeout: '⏰ Time Out!',
-        menuTitle: 'Arcade Games', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
+        menuTitle: 'Proterz Arcade', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
     },
     'ES': {
         title: 'Damas', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Nueva Partida', turnW: '¡Tu turno! (Rojas)', turnB: 'IA pensando...',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
         timeout: '⏰ ¡Tiempo Agotado!',
-        menuTitle: 'Juegos Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
     }
 };
 
