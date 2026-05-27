@@ -58,13 +58,12 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
     color: var(--text-color);
     padding: 6px 0;
     border-radius: 8px;
-    margin-bottom: 20px;
+    margin: 0 auto 20px auto;
     width: 140px;
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    transition: background-color 0.3s, color 0.3s;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
 }
 
@@ -72,6 +71,7 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .blink-red-fast { animation: flashRed 1s infinite; }
 .flash-red-once { animation: flashRed 1s 1; }
 .rapid-blink { animation: flashRed 0.2s 5; }
+.timeout-red { background-color: #9B111E !important; color: white !important; }
 
 @keyframes flashYellow {
     0%, 100% { background-color: var(--cell-border); color: var(--text-color); }
@@ -90,22 +90,22 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
     animation: softKingPulse 1.5s infinite ease-in-out;
 }
 
-/* Grid do Tabuleiro */
+/* Grid Responsivo do Tabuleiro */
 .board-container { margin-bottom: 20px; border: 4px solid var(--text-color); border-radius: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); background-color: var(--cell-border); }
 .chessboard { 
     display: grid; 
-    grid-template-columns: repeat(8, 45px); 
-    grid-template-rows: repeat(8, 45px);    
-    width: 360px; 
-    height: 360px; 
+    grid-template-columns: repeat(8, 1fr); 
+    grid-template-rows: repeat(8, 1fr);    
+    width: min(90vw, 360px); 
+    height: min(90vw, 360px); 
 }
 .square { 
-    width: 45px;
-    height: 45px;
+    width: 100%;
+    height: 100%;
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    font-size: 2.2rem; 
+    font-size: min(2.2rem, 8vw); 
     line-height: 1; 
     cursor: pointer; 
     user-select: none; 

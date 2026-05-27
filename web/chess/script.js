@@ -181,8 +181,6 @@ function resetTimer() {
     clearInterval(timerInterval);
     timerStarted = false;
     timerEl.className = 'timer-box'; 
-    timerEl.style.backgroundColor = '';
-    timerEl.style.color = '';
 
     if (currentDifficulty === 'easy') {
         timeSeconds = 0;
@@ -241,13 +239,10 @@ function timeOutLoss(finalDisplay) {
     clearInterval(timerInterval);
     gameActive = false;
     timerEl.innerText = finalDisplay;
-    
     timerEl.className = 'timer-box rapid-blink'; 
     
     setTimeout(() => {
-        timerEl.className = 'timer-box'; 
-        timerEl.style.backgroundColor = '#9B111E'; 
-        timerEl.style.color = 'white';
+        timerEl.className = 'timer-box timeout-red'; 
     }, 1000);
 
     statusEl.innerText = texts[currentLang].timeout; 
