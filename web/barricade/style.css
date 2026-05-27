@@ -9,10 +9,10 @@
     --cell-border: #cbd5e1;
     --cell-bg: #e2e8f0;
     --wall-color: #64748b;
-    --wall-hover: rgba(59, 130, 246, 0.4);
+    --wall-hover: rgba(59, 130, 246, 0.6);
     
-    --p1-color: #ef4444; /* Vermelho - Jogador */
-    --p2-color: #3b82f6; /* Azul - IA */
+    --p1-color: #ef4444; 
+    --p2-color: #3b82f6; 
 }
 
 body.dark-mode {
@@ -23,9 +23,9 @@ body.dark-mode {
     
     --board-bg: #1e293b;
     --cell-border: #334155;
-    --cell-bg: #334155;
+    --cell-bg: #475569;
     --wall-color: #f8fafc;
-    --wall-hover: rgba(248, 250, 252, 0.3);
+    --wall-hover: rgba(248, 250, 252, 0.5);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -36,7 +36,7 @@ body { background-color: var(--bg-color); color: var(--text-color); transition: 
 .icon-btn:hover { color: var(--primary); transform: scale(1.1); }
 .lang-btn { font-size: 1rem; font-weight: bold; border: 2px solid var(--text-color); border-radius: 50%; width: 38px; height: 38px; padding: 0; }
 
-.container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; }
+.container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; width: 100%; }
 h1 { margin-bottom: 20px; font-size: 2.5rem; }
 
 .diff-selector { display: flex; background-color: var(--btn-bg); border-radius: 8px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 320px; }
@@ -45,8 +45,9 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; }
 .diff-btn.active[data-diff="medium"] { background-color: #eab308; color: white; }
 .diff-btn.active[data-diff="hard"] { background-color: #ef4444; color: white; }
 
-.game-layout { display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
-.board-column { display: flex; flex-direction: column; align-items: center; }
+/* Layout e Centralização */
+.game-layout { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
+.board-column { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .hud-column { display: flex; flex-direction: column; gap: 20px; width: 250px; }
 
 .player-card { padding: 15px; border-radius: 10px; background-color: var(--board-bg); border: 2px solid var(--cell-border); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -56,13 +57,19 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; }
 
 .timer-box { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: bold; background-color: var(--cell-border); color: var(--text-color); padding: 6px 0; border-radius: 8px; margin-bottom: 20px; width: 140px; text-align: center; }
 
-/* Grid Entrelaçado do Barricade */
-.board-container { padding: 10px; border-radius: 8px; background-color: var(--board-bg); box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: 2px solid var(--cell-border); }
+.blink-yellow { animation: flashYellow 2s 3; }
+.blink-red-fast { animation: flashRed 1s infinite; }
+.rapid-blink { animation: flashRed 0.2s 5; }
+
+@keyframes flashYellow { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #eab308; color: white; } }
+@keyframes flashRed { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #9B111E; color: white; } }
+
+/* Grid 17x17 exato: Células de 42px e paredes de 12px */
+.board-container { padding: 15px; border-radius: 8px; background-color: var(--board-bg); box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: 2px solid var(--cell-border); }
 .interlock-grid {
     display: grid;
-    /* 9 células de 40px, 8 gaps de 10px = 17x17 grid lógico */
-    grid-template-columns: repeat(8, 40px 10px) 40px;
-    grid-template-rows: repeat(8, 40px 10px) 40px;
+    grid-template-columns: repeat(8, 42px 12px) 42px;
+    grid-template-rows: repeat(8, 42px 12px) 42px;
     background-color: var(--board-bg);
 }
 
@@ -70,15 +77,13 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; }
 .cell:hover { filter: brightness(0.9); }
 .cell.valid-move { box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.8); }
 
-.wall-h { cursor: pointer; border-radius: 2px; transition: 0.2s; }
-.wall-v { cursor: pointer; border-radius: 2px; transition: 0.2s; }
+.wall-h { background-color: transparent; cursor: pointer; transition: 0.1s; }
+.wall-v { background-color: transparent; cursor: pointer; transition: 0.1s; }
 .intersection { background-color: transparent; }
 
-/* Hover effect visualizando parede dupla */
-.wall-h:hover { background-color: var(--wall-hover); box-shadow: 50px 0 0 var(--wall-hover); z-index: 10; }
-.wall-v:hover { background-color: var(--wall-hover); box-shadow: 0 50px 0 var(--wall-hover); z-index: 10; }
-
-.wall-placed { background-color: var(--wall-color) !important; box-shadow: none !important; cursor: not-allowed; }
+/* Estilos para Paredes */
+.wall-hover { background-color: var(--wall-hover) !important; border-radius: 2px; }
+.wall-placed { background-color: var(--wall-color) !important; border-radius: 2px; cursor: not-allowed; }
 
 .pawn { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
 .pawn.p1 { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); }
@@ -86,7 +91,7 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; }
 
 .status-area { text-align: center; }
 #status { margin-bottom: 15px; height: 30px; }
-#restart { padding: 12px 24px; font-weight: bold; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
+#restart { padding: 12px 24px; font-weight: bold; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; }
 #restart:hover { filter: brightness(1.1); }
 
 /* Menu Lateral */

@@ -82,7 +82,7 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
-// SOM (Mesmo comportamento de fading robusto)
+// SOM
 const soundBtn = document.getElementById('soundBtn');
 const savedVol = localStorage.getItem('arcadeVolume');
 
@@ -155,19 +155,108 @@ bgMusic.onended = () => {
     playNextTrack(false);
 };
 
+// LÓGICA DO RELÓGIO (TIMER)
+let timerInterval = null;
+let timerStarted = false;
+let timeSeconds = 0;
+const timerEl = document.getElementById('playerTimer');
+
+function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerStarted = false;
+    timerEl.className = 'timer-box'; 
+    timerEl.style.backgroundColor = '';
+    timerEl.style.color = '';
+
+    if (currentDifficulty === 'easy') {
+        timeSeconds = 0;
+        timerEl.innerText = '00:00';
+    } else if (currentDifficulty === 'medium') {
+        timeSeconds = 5 * 60; 
+        timerEl.innerText = '05:00';
+    } else {
+        timeSeconds = 3 * 60; 
+        timerEl.innerText = '03:00';
+    }
+}
+
+function startTimer() {
+    if (timerStarted) return;
+    timerStarted = true;
+    
+    timerInterval = setInterval(() => {
+        if (!gameActive || currentTurn === 'b') return;
+
+        if (currentDifficulty === 'easy') {
+            timeSeconds++;
+            if (timeSeconds >= 59 * 60 + 59) { 
+                timeOutLoss('59:59');
+                return;
+            }
+            if (timeSeconds === 40 * 60) {
+                timerEl.classList.add('blink-yellow');
+                setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
+            }
+            if (timeSeconds > 58 * 60 && timeSeconds % 10 === 0) {
+                timerEl.classList.add('flash-red-once');
+                setTimeout(() => timerEl.classList.remove('flash-red-once'), 1000);
+            }
+
+        } else {
+            timeSeconds--;
+            if (timeSeconds <= 0) {
+                timeOutLoss('00:00');
+                return;
+            }
+            if (timeSeconds === 60) {
+                timerEl.classList.add('blink-yellow');
+                setTimeout(() => timerEl.classList.remove('blink-yellow'), 6000);
+            }
+            if (timeSeconds === 15) {
+                timerEl.classList.add('blink-red-fast');
+            }
+        }
+        
+        timerEl.innerText = formatTime(timeSeconds);
+    }, 1000);
+}
+
+function timeOutLoss(finalDisplay) {
+    clearInterval(timerInterval);
+    gameActive = false;
+    timerEl.innerText = finalDisplay;
+    timerEl.className = 'timer-box rapid-blink'; 
+    
+    setTimeout(() => {
+        timerEl.className = 'timer-box'; 
+        timerEl.style.backgroundColor = '#9B111E'; 
+        timerEl.style.color = 'white';
+    }, 1000);
+
+    statusEl.innerText = texts[currentLang].timeout; 
+    statusEl.className = "status-red";
+}
+
+
 // --- ENGINE DE BARRICADE (QUORIDOR) ---
-// O tabuleiro é um grid lógico 17x17. Células pares (0, 2, 4) são blocos. Ímpares são muros.
 let gameActive = true;
 let currentDifficulty = 'hard';
 let currentTurn = 'w'; 
-let p1Pos = { r: 16, c: 8 }; // Player 1 (Red/Bottom) target row = 0
-let p2Pos = { r: 0, c: 8 };  // Player 2 (Blue/Top) target row = 16
+let p1Pos = { r: 16, c: 8 }; 
+let p2Pos = { r: 0, c: 8 };  
 let p1Walls = 10;
 let p2Walls = 10;
-let gridState = Array(17).fill().map(() => Array(17).fill(0)); // 0 = vazio, 1 = muro, 2 = player
+let gridState = Array(17).fill().map(() => Array(17).fill(0)); 
 
 const boardEl = document.getElementById('barricadeboard');
 const statusEl = document.getElementById('status');
+const diffButtons = document.querySelectorAll('.diff-btn');
 
 function initGame() {
     gridState = Array(17).fill().map(() => Array(17).fill(0));
@@ -177,8 +266,9 @@ function initGame() {
     p2Walls = 10;
     gameActive = true;
     currentTurn = 'w';
-    renderBoard();
+    resetTimer();
     updateHUD();
+    renderBoard();
 }
 
 function updateHUD() {
@@ -187,19 +277,16 @@ function updateHUD() {
     updateStatusText();
 }
 
-// Retorna os movimentos de peão válidos (pulando o oponente se necessário)
 function getValidMoves(pos) {
     let moves = [];
-    const dirs = [[-2, 0], [2, 0], [0, -2], [0, 2]]; // Movimento de célula pra célula (pula o muro)
+    const dirs = [[-2, 0], [2, 0], [0, -2], [0, 2]]; 
     
     for (let [dr, dc] of dirs) {
         let nr = pos.r + dr, nc = pos.c + dc;
-        let wr = pos.r + dr/2, wc = pos.c + dc/2; // O muro entre as células
+        let wr = pos.r + dr/2, wc = pos.c + dc/2; 
         
         if (nr >= 0 && nr < 17 && nc >= 0 && nc < 17 && gridState[wr][wc] === 0) {
-            // Se tem um oponente na célula alvo
             if ((nr === p1Pos.r && nc === p1Pos.c) || (nr === p2Pos.r && nc === p2Pos.c)) {
-                // Tenta pular por cima
                 let j_nr = nr + dr, j_nc = nc + dc;
                 let j_wr = nr + dr/2, j_wc = nc + dc/2;
                 if (j_nr >= 0 && j_nr < 17 && j_nc >= 0 && j_nc < 17 && gridState[j_wr][j_wc] === 0) {
@@ -213,31 +300,26 @@ function getValidMoves(pos) {
     return moves;
 }
 
-// Verifica se colocar um muro nas posições dadas é legal
+// Verifica se colocar muro é válido. Impede completamente sobreposições!
 function isWallLegal(r, c, type) {
-    if (gridState[r][c] !== 0) return false;
-    
     if (type === 'H') {
-        if (c + 2 >= 17 || gridState[r][c+1] !== 0 || gridState[r][c+2] !== 0) return false;
+        if (c + 2 >= 17 || gridState[r][c] !== 0 || gridState[r][c+1] !== 0 || gridState[r][c+2] !== 0) return false;
     } else {
-        if (r + 2 >= 17 || gridState[r+1][c] !== 0 || gridState[r+2][c] !== 0) return false;
+        if (r + 2 >= 17 || gridState[r][c] !== 0 || gridState[r+1][c] !== 0 || gridState[r+2][c] !== 0) return false;
     }
 
-    // Simula colocar o muro
     gridState[r][c] = 1;
     if (type === 'H') { gridState[r][c+1] = 1; gridState[r][c+2] = 1; }
     else { gridState[r+1][c] = 1; gridState[r+2][c] = 1; }
 
-    // Valida o pathfinding (Nenhum jogador pode ficar trancado)
-    let p1Path = getShortestPathLength(p1Pos, 0);
-    let p2Path = getShortestPathLength(p2Pos, 16);
+    let p1Path = getShortestPath(p1Pos, 0);
+    let p2Path = getShortestPath(p2Pos, 16);
 
-    // Reverte a simulação
     gridState[r][c] = 0;
     if (type === 'H') { gridState[r][c+1] = 0; gridState[r][c+2] = 0; }
     else { gridState[r+1][c] = 0; gridState[r+2][c] = 0; }
 
-    return p1Path !== Infinity && p2Path !== Infinity;
+    return p1Path !== null && p2Path !== null;
 }
 
 function placeWall(r, c, type, isP1) {
@@ -247,25 +329,37 @@ function placeWall(r, c, type, isP1) {
     else { gridState[r+1][c] = 1; gridState[r+2][c] = 1; }
 }
 
-// Pathfinding Algoritmo BFS para encontrar o menor caminho até a linha de objetivo
-function getShortestPathLength(startPos, targetRow) {
-    let queue = [{ r: startPos.r, c: startPos.c, dist: 0 }];
+// BFS - Retorna a ROTA INTEIRA (usada pela IA para previsão do futuro)
+function getShortestPath(startPos, targetRow) {
+    let queue = [{ r: startPos.r, c: startPos.c, path: [] }];
     let visited = Array(17).fill().map(() => Array(17).fill(false));
     visited[startPos.r][startPos.c] = true;
 
     while (queue.length > 0) {
         let curr = queue.shift();
-        if (curr.r === targetRow) return curr.dist;
+        if (curr.r === targetRow) return curr.path;
 
         let moves = getValidMoves({ r: curr.r, c: curr.c });
         for (let m of moves) {
             if (!visited[m.r][m.c]) {
                 visited[m.r][m.c] = true;
-                queue.push({ r: m.r, c: m.c, dist: curr.dist + 1 });
+                queue.push({ r: m.r, c: m.c, path: [...curr.path, m] });
             }
         }
     }
-    return Infinity; // Trancado
+    return null; 
+}
+
+// Highlight Lógico das Paredes (Preenche a linha reta completa)
+function highlightWall(r, c, type, isHover) {
+    const ids = type === 'H' ? [`cell-${r}-${c}`, `cell-${r}-${c+1}`, `cell-${r}-${c+2}`] : [`cell-${r}-${c}`, `cell-${r+1}-${c}`, `cell-${r+2}-${c}`];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (isHover) el.classList.add('wall-hover');
+            else el.classList.remove('wall-hover');
+        }
+    });
 }
 
 function renderBoard() {
@@ -275,6 +369,7 @@ function renderBoard() {
     for (let r = 0; r < 17; r++) {
         for (let c = 0; c < 17; c++) {
             const el = document.createElement('div');
+            el.id = `cell-${r}-${c}`;
             
             // Células (Peões)
             if (r % 2 === 0 && c % 2 === 0) {
@@ -282,7 +377,10 @@ function renderBoard() {
                 let isTargetMove = validMoves.some(m => m.r === r && m.c === c);
                 if (isTargetMove) {
                     el.classList.add('valid-move');
-                    el.addEventListener('click', () => movePlayerTo(r, c));
+                    el.addEventListener('click', () => {
+                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        movePlayerTo(r, c);
+                    });
                 }
 
                 if (p1Pos.r === r && p1Pos.c === c) {
@@ -297,21 +395,34 @@ function renderBoard() {
             } 
             // Muros Horizontais
             else if (r % 2 !== 0 && c % 2 === 0) {
-                el.className = gridState[r][c] === 1 ? 'wall-h wall-placed' : 'wall-h';
-                if (gridState[r][c] === 0 && currentTurn === 'w' && gameActive && p1Walls > 0 && isWallLegal(r, c, 'H')) {
-                    el.addEventListener('click', () => { placeWall(r, c, 'H', true); switchTurn(); });
+                el.className = 'wall-h';
+                if (gridState[r][c] === 1) el.classList.add('wall-placed');
+                else if (currentTurn === 'w' && gameActive && p1Walls > 0 && isWallLegal(r, c, 'H')) {
+                    el.addEventListener('mouseover', () => highlightWall(r, c, 'H', true));
+                    el.addEventListener('mouseout', () => highlightWall(r, c, 'H', false));
+                    el.addEventListener('click', () => { 
+                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        placeWall(r, c, 'H', true); switchTurn(); 
+                    });
                 }
             }
             // Muros Verticais
             else if (r % 2 === 0 && c % 2 !== 0) {
-                el.className = gridState[r][c] === 1 ? 'wall-v wall-placed' : 'wall-v';
-                if (gridState[r][c] === 0 && currentTurn === 'w' && gameActive && p1Walls > 0 && isWallLegal(r, c, 'V')) {
-                    el.addEventListener('click', () => { placeWall(r, c, 'V', true); switchTurn(); });
+                el.className = 'wall-v';
+                if (gridState[r][c] === 1) el.classList.add('wall-placed');
+                else if (currentTurn === 'w' && gameActive && p1Walls > 0 && isWallLegal(r, c, 'V')) {
+                    el.addEventListener('mouseover', () => highlightWall(r, c, 'V', true));
+                    el.addEventListener('mouseout', () => highlightWall(r, c, 'V', false));
+                    el.addEventListener('click', () => { 
+                        if (!timerStarted) startTimer(); // Timer Ativado!
+                        placeWall(r, c, 'V', true); switchTurn(); 
+                    });
                 }
             }
             // Interseções
             else {
-                el.className = gridState[r][c] === 1 ? 'intersection wall-placed' : 'intersection';
+                el.className = 'intersection';
+                if (gridState[r][c] === 1) el.classList.add('wall-placed');
             }
 
             boardEl.appendChild(el);
@@ -338,74 +449,113 @@ function switchTurn() {
     }
 }
 
-// IA Heurística (Tenta maximizar a distância do jogador enquanto diminui a própria)
+// IA com Simulação de Movimentos e Avaliação de Paredes
 function makeAiMove() {
     if (!gameActive) return;
 
     let bestScore = -Infinity;
-    let bestAction = null; // { type: 'move'|'wall', val: obj }
+    let bestAction = null; 
 
-    let p1CurrentDist = getShortestPathLength(p1Pos, 0);
+    let p1Path = getShortestPath(p1Pos, 0);
+    let p2Path = getShortestPath(p2Pos, 16);
+
+    let p1Dist = p1Path ? p1Path.length : Infinity;
+    let p2Dist = p2Path ? p2Path.length : Infinity;
+
+    // Simula cada movimento possível do jogador e avalia o impacto na distância da IA até a vitória. Quanto mais próximo o jogador estiver de vencer, mais urgente é bloquear ou avançar.
     let moves = getValidMoves(p2Pos);
-
-    // 1. Avalia Mover o Peão
     for (let m of moves) {
         let oldPos = p2Pos; p2Pos = m;
-        let p2Dist = getShortestPathLength(p2Pos, 16);
-        p2Pos = oldPos; // Reverte simulação
+        let newP2Path = getShortestPath(p2Pos, 16);
+        p2Pos = oldPos; 
         
-        let score = (p1CurrentDist - p2Dist); 
-        // Adiciona pequena aleatoriedade para não ser 100% robótico
-        if (currentDifficulty !== 'hard') score += (Math.random() * 2 - 1); 
+        if (newP2Path) {
+            let score = (p1Dist - newP2Path.length); 
+            if (currentDifficulty !== 'hard') score += (Math.random() * 2 - 1); 
 
-        if (score > bestScore) {
-            bestScore = score;
-            bestAction = { type: 'move', val: m };
-        }
-    }
-
-    // 2. Avalia Colocar Muro (Somente Médio e Difícil se tiver muros)
-    if (p2Walls > 0 && currentDifficulty !== 'easy' && p1CurrentDist <= 6) {
-        // Para não explodir processamento, a IA testa muros perto do jogador
-        for (let r = Math.max(1, p1Pos.r - 4); r <= Math.min(15, p1Pos.r + 4); r+=2) {
-            for (let c = 0; c < 16; c+=2) {
-                // Testa Horizontal e Vertical
-                ['H', 'V'].forEach(dir => {
-                    let rCheck = dir === 'H' ? r-1 : r;
-                    let cCheck = dir === 'V' ? c-1 : c;
-                    
-                    if (rCheck > 0 && cCheck > 0 && isWallLegal(rCheck, cCheck, dir)) {
-                        placeWall(rCheck, cCheck, dir, false);
-                        let newP1Dist = getShortestPathLength(p1Pos, 0);
-                        let newP2Dist = getShortestPathLength(p2Pos, 16);
-                        
-                        // Retira muro
-                        gridState[rCheck][cCheck] = 0;
-                        if (dir === 'H') { gridState[rCheck][cCheck+1] = 0; gridState[rCheck][cCheck+2] = 0; }
-                        else { gridState[rCheck+1][cCheck] = 0; gridState[rCheck+2][cCheck] = 0; }
-                        p2Walls++;
-
-                        let score = (newP1Dist - newP2Dist) + 0.5; // Bônus por bloquear
-                        if (score > bestScore) {
-                            bestScore = score;
-                            bestAction = { type: 'wall', val: { r: rCheck, c: cCheck, dir: dir } };
-                        }
-                    }
-                });
+            if (score > bestScore) {
+                bestScore = score;
+                bestAction = { type: 'move', val: m };
             }
         }
     }
 
-    if (bestAction.type === 'move') {
+    // Se a IA tiver paredes, e o jogador estiver em um caminho claro para vencer, tente colocar uma parede que bloqueie ou atrase o jogador. A IA analisa os próximos passos do jogador e tenta colocar paredes que forcem o jogador a desviar.
+    if (p2Walls > 0 && currentDifficulty !== 'easy' && p1Path && p1Path.length > 0) {
+        
+        let wallCandidates = [];
+        // Analisa os próximos 4 passos exatos que o jogador quer dar
+        let stepsToBlock = p1Path.slice(0, 4);
+        stepsToBlock.push(p1Pos); 
+        
+        for (let step of stepsToBlock) {
+            let r = step.r, c = step.c;
+            // Gera potenciais paredes ao redor do passo do jogador (tanto horizontais quanto verticais)
+            let potentialWalls = [
+                {r: r-1, c: c, dir: 'H'}, {r: r-1, c: c-2, dir: 'H'},
+                {r: r+1, c: c, dir: 'H'}, {r: r+1, c: c-2, dir: 'H'},
+                {r: r, c: c-1, dir: 'V'}, {r: r-2, c: c-1, dir: 'V'},
+                {r: r, c: c+1, dir: 'V'}, {r: r-2, c: c+1, dir: 'V'}
+            ];
+            for (let pw of potentialWalls) {
+                if (pw.r > 0 && pw.r < 17 && pw.c > 0 && pw.c < 17) {
+                    wallCandidates.push(pw);
+                }
+            }
+        }
+
+        // Remove duplicatas exatas (muitas paredes podem ser sugeridas múltiplas vezes)
+        let uniqueWalls = wallCandidates.filter((v, i, a) => a.findIndex(t => (t.r === v.r && t.c === v.c && t.dir === v.dir)) === i);
+
+        for (let cand of uniqueWalls) {
+            let rCheck = cand.r, cCheck = cand.c, dir = cand.dir;
+            
+            if (isWallLegal(rCheck, cCheck, dir)) {
+                placeWall(rCheck, cCheck, dir, false);
+                let newP1Path = getShortestPath(p1Pos, 0);
+                let newP2Path = getShortestPath(p2Pos, 16);
+                
+                // Reverte a parede para não afetar as simulações seguintes
+                gridState[rCheck][cCheck] = 0;
+                if (dir === 'H') { gridState[rCheck][cCheck+1] = 0; gridState[rCheck][cCheck+2] = 0; }
+                else { gridState[rCheck+1][cCheck] = 0; gridState[rCheck+2][cCheck] = 0; }
+                p2Walls++;
+
+                if (newP1Path && newP2Path) {
+                    let newP1Dist = newP1Path.length;
+                    let newP2Dist = newP2Path.length;
+                    let score = (newP1Dist - newP2Dist);
+                    
+                    // No difícil, prioriza MUITO bloquear o caminho do jogador. No médio, é um fator aleatório.
+                    if (currentDifficulty === 'hard') {
+                        score += (newP1Dist - p1Dist) * 2; 
+                    } else {
+                        score += Math.random(); 
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestAction = { type: 'wall', val: cand };
+                    }
+                }
+            }
+        }
+    }
+
+    if (bestAction && bestAction.type === 'move') {
         movePlayerTo(bestAction.val.r, bestAction.val.c);
-    } else {
+    } else if (bestAction && bestAction.type === 'wall') {
         placeWall(bestAction.val.r, bestAction.val.c, bestAction.val.dir, false);
         switchTurn();
+    } else {
+        let fallbackMoves = getValidMoves(p2Pos);
+        if (fallbackMoves.length > 0) movePlayerTo(fallbackMoves[0].r, fallbackMoves[0].c);
     }
 }
 
 function handleGameOver(winner) {
     gameActive = false;
+    clearInterval(timerInterval);
     if (winner === 'w') {
         statusEl.innerText = texts[currentLang].win;
         statusEl.className = "status-green";
@@ -428,7 +578,9 @@ function updateStatusText() {
     }
 }
 
-document.getElementById('restart').addEventListener('click', initGame);
+document.getElementById('restart').addEventListener('click', () => {
+    initGame();
+});
 
 diffButtons.forEach(btn => {
     btn.addEventListener('click', () => {
