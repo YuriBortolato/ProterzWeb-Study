@@ -93,7 +93,6 @@ let targetVolume = volumeState === 2 ? 1.0 : (volumeState === 1 ? 0.25 : 0.0);
 const bgMusic = new Audio();
 let currentTrackIndex = 1;
 
-// Ajuste os diretórios de música para puxar da pasta do Xadrez temporariamente
 const playlists = {
     'easy': { total: 6, path: '../audio/chess/easy/musica' },
     'medium': { total: 4, path: '../audio/chess/medium/musica' },
@@ -182,8 +181,6 @@ function resetTimer() {
     clearInterval(timerInterval);
     timerStarted = false;
     timerEl.className = 'timer-box'; 
-    timerEl.style.backgroundColor = '';
-    timerEl.style.color = '';
 
     if (currentDifficulty === 'easy') {
         timeSeconds = 0;
@@ -242,13 +239,10 @@ function timeOutLoss(finalDisplay) {
     clearInterval(timerInterval);
     gameActive = false;
     timerEl.innerText = finalDisplay;
-    
     timerEl.className = 'timer-box rapid-blink'; 
     
     setTimeout(() => {
-        timerEl.className = 'timer-box'; 
-        timerEl.style.backgroundColor = '#9B111E'; 
-        timerEl.style.color = 'white';
+        timerEl.className = 'timer-box timeout-red'; 
     }, 1000);
 
     statusEl.innerText = texts[currentLang].timeout; 
@@ -281,7 +275,6 @@ function initBoard() {
     ];
 }
 
-// Retorna todas as jogadas possíveis para uma cor. Retorna APENAS capturas se alguma existir (regra oficial).
 function getPossibleMoves(board, playerColor) {
     let moves = [];
     let captures = [];
@@ -300,11 +293,9 @@ function getPossibleMoves(board, playerColor) {
 
                 for (let [dr, dc] of dirs) {
                     let nr = r + dr, nc = c + dc;
-                    // Movimento simples
                     if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === 0) {
                         moves.push({ from: { r, c }, to: { r: nr, c: nc } });
                     }
-                    // Movimento de captura (comer)
                     let jr = r + dr * 2, jc = c + dc * 2;
                     if (jr >= 0 && jr < 8 && jc >= 0 && jc < 8 && board[jr][jc] === 0) {
                         if (board[nr][nc] === opp || board[nr][nc] === oppK) {
@@ -329,7 +320,6 @@ function applyMove(board, move, playerColor) {
         newBoard[move.jump.r][move.jump.c] = 0;
     }
 
-    // Coroação (Vira Dama)
     if (playerColor === 'w' && move.to.r === 0) newBoard[move.to.r][move.to.c] = 'W';
     if (playerColor === 'b' && move.to.r === 7) newBoard[move.to.r][move.to.c] = 'B';
 
@@ -343,13 +333,12 @@ function renderBoard() {
     let allPlayerMoves = [];
     let hasMandatoryCapture = false;
 
-    // Verifica se o jogador tem movimentos disponíveis e se há captura obrigatória
     if (gameActive) {
         allPlayerMoves = getPossibleMoves(boardState, currentTurn);
         if (allPlayerMoves.length === 0) {
             handleGameOver(currentTurn === 'w' ? 'b' : 'w');
         } else if (allPlayerMoves[0].jump) {
-            hasMandatoryCapture = true; // Se o primeiro movimento listado tiver um salto, a captura é obrigatória
+            hasMandatoryCapture = true; 
         }
     }
 
@@ -360,7 +349,6 @@ function renderBoard() {
             squareEl.className = `square ${isLight ? 'light' : 'dark'}`;
             
             if (!isLight) {
-                // Highlights de seleção e possíveis jogadas
                 if (selectedSquare && selectedSquare.r === r && selectedSquare.c === c) {
                     squareEl.classList.add('selected');
                 }
@@ -371,14 +359,12 @@ function renderBoard() {
                     squareEl.style.cursor = "pointer";
                 }
 
-                // Renderização das peças
                 const piece = boardState[r][c];
                 if (piece !== 0) {
                     const pieceEl = document.createElement('div');
                     pieceEl.className = `checker-piece ${piece.toLowerCase() === 'w' ? 'checker-w' : 'checker-b'}`;
                     if (piece === 'W' || piece === 'B') pieceEl.classList.add('checker-king');
                     
-                    // Animação de alerta para peças que têm captura obrigatória
                     if (gameActive && currentTurn === 'w' && piece.toLowerCase() === 'w' && hasMandatoryCapture) {
                         let canThisPieceCapture = allPlayerMoves.some(m => m.from.r === r && m.from.c === c);
                         if (canThisPieceCapture) {
@@ -403,7 +389,6 @@ function handleSquareClick(r, c, allPlayerMoves) {
 
     const piece = boardState[r][c];
     
-    // Se clicou num lugar válido pra andar
     let targetMove = validMovesForSelected.find(m => m.to.r === r && m.to.c === c);
     
     if (targetMove) {
@@ -415,7 +400,6 @@ function handleSquareClick(r, c, allPlayerMoves) {
         
         if (gameActive) setTimeout(makeAiMove, 100);
     } else {
-        // Se clicou na própria peça para selecionar
         if (piece === 'w' || piece === 'W') {
             selectedSquare = { r, c };
             validMovesForSelected = allPlayerMoves.filter(m => m.from.r === r && m.from.c === c);
@@ -489,7 +473,7 @@ function makeAiMove() {
         let bestValue = -Infinity;
         let depth = currentDifficulty === 'medium' ? 2 : 4; 
         
-        moves.sort(() => Math.random() - 0.5); // Randomiza pra não ser repetitivo
+        moves.sort(() => Math.random() - 0.5); 
         
         for (let move of moves) {
             let simulatedBoard = applyMove(boardState, move, 'b');
