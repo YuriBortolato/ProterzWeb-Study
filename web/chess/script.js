@@ -1,6 +1,5 @@
 // --- SISTEMA DE UI GLOBAL (Idioma, Tema, Som, Menu) ---
 
-// IDIOMA
 let currentLang = localStorage.getItem('arcadeLang') || 'PT';
 const texts = {
     'PT': {
@@ -8,21 +7,30 @@ const texts = {
         restart: 'Nova Partida', turnW: 'Sua vez! (Brancas)', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
         timeout: '⏰ Tempo Esgotado!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Regras - Xadrez',
+        rulesBody: 'Objetivo: Dar xeque-mate no rei adversário.\n\nRegras Básicas:\n1. As Brancas sempre começam.\n2. Para mover, clique na peça e depois no destino (destacado em verde).\n3. O jogo detecta movimentos válidos, xeque, xeque-mate e empates automaticamente.\n\n- O tempo esgotado resulta em derrota automática.',
+        rulesBtn: 'Entendi'
     },
     'EN': {
         title: 'Chess', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'New Game', turnW: 'Your turn! (White)', turnB: 'AI thinking...',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
         timeout: '⏰ Time Out!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
+        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade',
+        rulesTitle: 'Rules - Chess',
+        rulesBody: 'Goal: Checkmate the opponent\'s king.\n\nBasic Rules:\n1. White always moves first.\n2. To move, click a piece and then click the target square (highlighted in green).\n3. The game automatically detects valid moves, check, checkmate, and draws.\n\n- Running out of time results in an automatic loss.',
+        rulesBtn: 'I Got It'
     },
     'ES': {
         title: 'Ajedrez', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Nueva Partida', turnW: '¡Tu turno! (Blancas)', turnB: 'IA pensando...',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
         timeout: '⏰ ¡Tiempo Agotado!',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Reglas - Ajedrez',
+        rulesBody: 'Objetivo: Dar jaque mate al rey oponente.\n\nReglas Básicas:\n1. Las blancas siempre empiezan.\n2. Para mover, haz clic en la pieza y luego en el destino (resaltado en verde).\n3. El juego detecta movimientos válidos, jaque, jaque mate y empates automáticamente.\n\n- Quedarse sin tiempo resulta en una derrota automática.',
+        rulesBtn: 'Entendido'
     }
 };
 
@@ -47,8 +55,25 @@ function updateLanguage() {
     document.getElementById('menuTicTac').innerText = t.menuTicTac;
     document.getElementById('menuChess').innerText = t.menuChess;
     document.getElementById('menuCheckers').innerText = t.menuCheckers;
+    document.getElementById('menuBarricade').innerText = t.menuBarricade;
+    
+    document.getElementById('txtRulesTitle').innerText = t.rulesTitle;
+    document.getElementById('txtRulesBody').innerText = t.rulesBody;
+    document.getElementById('closeRulesBtn').innerText = t.rulesBtn;
+    
     updateStatus();
 }
+
+// --- MODAL DE REGRAS ---
+const infoBtn = document.getElementById('infoBtn');
+const rulesModal = document.getElementById('rulesModal');
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+infoBtn.addEventListener('click', () => rulesModal.classList.add('open'));
+closeRulesBtn.addEventListener('click', () => rulesModal.classList.remove('open'));
+rulesModal.addEventListener('click', (e) => {
+    if(e.target === rulesModal) rulesModal.classList.remove('open');
+});
 
 // TEMA
 const themeBtn = document.getElementById('themeBtn');
@@ -82,7 +107,7 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
-// --- SOM E PLAYLISTS ---
+// SOM E PLAYLISTS
 const soundBtn = document.getElementById('soundBtn');
 const savedVol = localStorage.getItem('arcadeVolume');
 
@@ -152,7 +177,7 @@ function playNextTrack(forceRestart = false) {
     const playlist = playlists[currentDifficulty];
     if (forceRestart) currentTrackIndex = 1;
 
-    bgMusic.volume = 0; // Fix: previne o "estouro" zerando o volume antes de trocar a fonte
+    bgMusic.volume = 0;
     bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
     bgMusic.currentTime = 0; 
     applyVolumeSettings();
@@ -180,8 +205,6 @@ function resetTimer() {
     clearInterval(timerInterval);
     timerStarted = false;
     timerEl.className = 'timer-box'; 
-    timerEl.style.backgroundColor = '';
-    timerEl.style.color = '';
 
     if (currentDifficulty === 'easy') {
         timeSeconds = 0;
@@ -205,8 +228,7 @@ function startTimer() {
         if (currentDifficulty === 'easy') {
             timeSeconds++;
             if (timeSeconds >= 59 * 60 + 59) { 
-                timeOutLoss('59:59');
-                return;
+                timeOutLoss('59:59'); return;
             }
             if (timeSeconds === 40 * 60) {
                 timerEl.classList.add('blink-yellow');
@@ -216,12 +238,10 @@ function startTimer() {
                 timerEl.classList.add('flash-red-once');
                 setTimeout(() => timerEl.classList.remove('flash-red-once'), 1000);
             }
-
         } else {
             timeSeconds--;
             if (timeSeconds <= 0) {
-                timeOutLoss('00:00');
-                return;
+                timeOutLoss('00:00'); return;
             }
             if (timeSeconds === 60) {
                 timerEl.classList.add('blink-yellow');
@@ -231,7 +251,6 @@ function startTimer() {
                 timerEl.classList.add('blink-red-fast');
             }
         }
-        
         timerEl.innerText = formatTime(timeSeconds);
     }, 1000);
 }
@@ -240,20 +259,13 @@ function timeOutLoss(finalDisplay) {
     clearInterval(timerInterval);
     gameActive = false;
     timerEl.innerText = finalDisplay;
-    
     timerEl.className = 'timer-box rapid-blink'; 
-    
-    setTimeout(() => {
-        timerEl.className = 'timer-box'; 
-        timerEl.style.backgroundColor = '#9B111E'; 
-        timerEl.style.color = 'white';
-    }, 1000);
-
+    setTimeout(() => { timerEl.className = 'timer-box timeout-red'; }, 1000);
     statusEl.innerText = texts[currentLang].timeout; 
     statusEl.className = "status-red";
 }
 
-// IA MINIMAX
+// IA E JOGO
 function getPieceValue(piece) {
     if (!piece) return 0;
     const vals = { 'p': 10, 'n': 30, 'b': 30, 'r': 50, 'q': 90, 'k': 900 };
@@ -265,9 +277,7 @@ function evaluateBoard(gameInst) {
     const b = gameInst.board();
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-            if (b[r][c]) {
-                totalEvaluation += getPieceValue(b[r][c]);
-            }
+            if (b[r][c]) totalEvaluation += getPieceValue(b[r][c]);
         }
     }
     return totalEvaluation;
@@ -275,12 +285,7 @@ function evaluateBoard(gameInst) {
 
 function minimax(depth, gameInst, alpha, beta, isMaximizingPlayer) {
     const moves = gameInst.moves();
-    
-    if (moves.length === 0) {
-        if (gameInst.in_checkmate()) return isMaximizingPlayer ? -9999 : 9999;
-        return 0; 
-    }
-
+    if (moves.length === 0) return gameInst.in_checkmate() ? (isMaximizingPlayer ? -9999 : 9999) : 0; 
     if (depth === 0) return evaluateBoard(gameInst);
 
     if (isMaximizingPlayer) {
@@ -312,7 +317,6 @@ function getBestMove(gameInst, depth) {
     const moves = gameInst.moves();
     let bestValue = Infinity; 
     let bestMove = null;
-
     moves.sort(() => Math.random() - 0.5);
 
     for (let i = 0; i < moves.length; i++) {
@@ -320,7 +324,6 @@ function getBestMove(gameInst, depth) {
         gameInst.move(move);
         let boardValue = minimax(depth - 1, gameInst, -Infinity, Infinity, true);
         gameInst.undo();
-        
         if (boardValue < bestValue) {
             bestValue = boardValue;
             bestMove = move;
@@ -329,7 +332,6 @@ function getBestMove(gameInst, depth) {
     return bestMove || moves[0];
 }
 
-// MÓDULO VISUAL DO JOGO
 const boardEl = document.getElementById('chessboard');
 const statusEl = document.getElementById('status');
 const diffButtons = document.querySelectorAll('.diff-btn');
@@ -371,10 +373,7 @@ function renderBoard() {
             const piece = board[r][c];
             if (piece) {
                 squareEl.innerText = pieceUnicode[piece.color][piece.type];
-                
-                if (inCheck && piece.color === 'w' && piece.type === 'k') {
-                    squareEl.classList.add('king-pulse');
-                }
+                if (inCheck && piece.color === 'w' && piece.type === 'k') squareEl.classList.add('king-pulse');
             }
 
             squareEl.addEventListener('click', () => handleSquareClick(squareId));
@@ -386,19 +385,14 @@ function renderBoard() {
 
 function handleSquareClick(squareId) {
     if (!gameActive || game.turn() === 'b') return; 
-
     const piece = game.get(squareId);
-    if (!timerStarted && piece && piece.color === 'w') {
-        startTimer();
-    }
+    if (!timerStarted && piece && piece.color === 'w') startTimer();
 
     if (selectedSquare) {
         const move = game.move({ from: selectedSquare, to: squareId, promotion: 'q' });
-
         if (move) {
             selectedSquare = null;
             renderBoard();
-            
             if (!checkGameOver()) setTimeout(makeAiMove, 50); 
         } else {
             if (piece && piece.color === 'w') selectedSquare = squareId; 
@@ -419,13 +413,9 @@ function makeAiMove() {
     if (possibleMoves.length === 0) return;
 
     let selectedMove;
-    if (currentDifficulty === 'easy') {
-        selectedMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-    } else if (currentDifficulty === 'medium') {
-        selectedMove = getBestMove(game, 1); 
-    } else {
-        selectedMove = getBestMove(game, 2); 
-    }
+    if (currentDifficulty === 'easy') selectedMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+    else if (currentDifficulty === 'medium') selectedMove = getBestMove(game, 1); 
+    else selectedMove = getBestMove(game, 2); 
 
     game.move(selectedMove);
     renderBoard();
@@ -436,8 +426,17 @@ function checkGameOver() {
     if (game.in_checkmate()) {
         gameActive = false;
         clearInterval(timerInterval);
-        statusEl.innerText = game.turn() === 'w' ? texts[currentLang].lose : texts[currentLang].win;
-        statusEl.className = game.turn() === 'w' ? "status-red" : "status-green";
+        
+        // Se as pretas estão em mate (turn === 'b'), então o Jogador (Brancas) VENCEU
+        if (game.turn() === 'b') {
+            statusEl.innerText = texts[currentLang].win;
+            statusEl.className = "status-green";
+            timerEl.className = 'timer-box timeout-green';
+        } else {
+            statusEl.innerText = texts[currentLang].lose;
+            statusEl.className = "status-red";
+            timerEl.className = 'timer-box timeout-red';
+        }
         return true;
     } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
         gameActive = false;
@@ -451,7 +450,6 @@ function checkGameOver() {
 
 function updateStatus() {
     if (!gameActive || statusEl.innerText === texts[currentLang].timeout) return;
-    
     if (game.turn() === 'w') {
         statusEl.innerText = texts[currentLang].turnW;
         statusEl.className = "";

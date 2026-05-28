@@ -13,6 +13,7 @@ const menuOverlay = document.getElementById('menuOverlay');
 
 let board = Array(9).fill('');
 let gameActive = true;
+let isAiThinking = false;
 let currentDifficulty = 'hard';
 const HUMAN = 'X';
 const AI = 'O';
@@ -24,19 +25,28 @@ const texts = {
         title: 'Jogo da Velha', easy: 'Fácil', medium: 'Médio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: 'Sua vez! (X)',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Regras - Jogo da Velha',
+        rulesBody: 'Objetivo: Alinhar 3 símbolos iguais (X ou O) na horizontal, vertical ou diagonal.\n\nNa sua vez:\n1. Clique em um espaço vazio para marcar um X.\n2. Tente bloquear a IA (O) de formar uma linha de 3.\n\n- O jogo termina quando alguém alinha 3 ou todas as casas são preenchidas (Empate).',
+        rulesBtn: 'Entendi'
     },
     'EN': {
         title: 'Tic Tac Toe', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'Restart Match', turn: 'Your turn! (X)',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!', thinking: 'AI thinking...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers'
+        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade',
+        rulesTitle: 'Rules - Tic Tac Toe',
+        rulesBody: 'Goal: Align 3 of your symbols (X or O) horizontally, vertically, or diagonally.\n\nOn your turn:\n1. Click an empty square to place your X.\n2. Try to block the AI (O) from getting 3 in a row.\n\n- The game ends when someone gets 3 in a row or all squares are filled (Tie).',
+        rulesBtn: 'I Got It'
     },
     'ES': {
         title: 'Tres en Raya', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Reiniciar Partida', turn: '¡Tu turno! (X)',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!', thinking: 'IA pensando...',
-        menuTitle: 'Proterz Arcade', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas'
+        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Reglas - Tres en Raya',
+        rulesBody: 'Objetivo: Alinear 3 símbolos iguales (X u O) horizontal, vertical o diagonalmente.\n\nEn tu turno:\n1. Haz clic en un espacio vacío para marcar una X.\n2. Intenta bloquear a la IA (O) para que no forme una línea de 3.\n\n- El juego termina cuando alguien alinea 3 o se llenan todas las casillas (Empate).',
+        rulesBtn: 'Entendido'
     }
 };
 
@@ -60,13 +70,29 @@ function updateLanguage() {
     document.getElementById('menuTicTac').innerText = t.menuTicTac;
     document.getElementById('menuChess').innerText = t.menuChess;
     document.getElementById('menuCheckers').innerText = t.menuCheckers;
+    document.getElementById('menuBarricade').innerText = t.menuBarricade;
     
-    if (gameActive && statusText.innerText.includes('(X)')) {
+    document.getElementById('txtRulesTitle').innerText = t.rulesTitle;
+    document.getElementById('txtRulesBody').innerText = t.rulesBody;
+    document.getElementById('closeRulesBtn').innerText = t.rulesBtn;
+    
+    if (gameActive && !isAiThinking && statusText.innerText.includes('(X)')) {
         statusText.innerText = t.turn;
     }
 }
 
-// --- SISTEMA DE TEMA GLOBAL ---
+// --- MODAL DE REGRAS ---
+const infoBtn = document.getElementById('infoBtn');
+const rulesModal = document.getElementById('rulesModal');
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+infoBtn.addEventListener('click', () => rulesModal.classList.add('open'));
+closeRulesBtn.addEventListener('click', () => rulesModal.classList.remove('open'));
+rulesModal.addEventListener('click', (e) => {
+    if(e.target === rulesModal) rulesModal.classList.remove('open');
+});
+
+// --- SISTEMA DE TEMA E ÁUDIO ---
 const savedTheme = localStorage.getItem('arcadeTheme') || 'light';
 if (savedTheme === 'dark') {
     themeBtn.querySelector('i').className = 'fas fa-moon';
@@ -81,7 +107,6 @@ themeBtn.addEventListener('click', () => {
     localStorage.setItem('arcadeTheme', isDark ? 'dark' : 'light');
 });
 
-// --- SISTEMA DE ÁUDIO GLOBAL ---
 const savedVol = localStorage.getItem('arcadeVolume');
 let volumeState = savedVol !== null ? parseInt(savedVol) : 2;
 
@@ -122,13 +147,11 @@ soundBtn.addEventListener('click', () => {
     if (volumeState === 2) volumeState = 1;
     else if (volumeState === 1) volumeState = 0;
     else volumeState = 2;
-    
     updateSoundIcon();
     localStorage.setItem('arcadeVolume', volumeState); 
     applyVolume();
 });
 
-// --- MENU LATERAL ---
 menuBtn.addEventListener('click', () => {
     sideMenu.classList.add('open');
     menuOverlay.classList.add('open');
@@ -139,7 +162,6 @@ menuOverlay.addEventListener('click', () => {
     menuOverlay.classList.remove('open');
 });
 
-// --- SISTEMA DE DIFICULDADE ---
 diffButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         diffButtons.forEach(b => b.classList.remove('active'));
@@ -150,9 +172,8 @@ diffButtons.forEach(btn => {
     });
 });
 
-// --- LÓGICA DO JOGO ---
 cells.forEach(cell => cell.addEventListener('click', () => {
-    if (!gameActive || cell.textContent !== '') return;
+    if (!gameActive || cell.textContent !== '' || isAiThinking) return;
     
     if (volumeState > 0 && bgMusic.paused) bgMusic.play().catch(()=>{});
 
@@ -160,8 +181,12 @@ cells.forEach(cell => cell.addEventListener('click', () => {
     makeMove(index, HUMAN);
 
     if (gameActive) {
+        isAiThinking = true;
         statusText.innerText = texts[currentLang].thinking;
-        setTimeout(makeAiMove, 400);
+        setTimeout(() => {
+            makeAiMove();
+            isAiThinking = false;
+        }, 400);
     }
 }));
 
@@ -170,6 +195,7 @@ restartBtn.addEventListener('click', restartGame);
 function restartGame() {
     board = Array(9).fill('');
     gameActive = true;
+    isAiThinking = false;
     statusText.innerText = texts[currentLang].turn;
     statusText.className = "";
     cells.forEach(cell => {
@@ -187,13 +213,10 @@ function makeMove(index, player) {
 
 function makeAiMove() {
     let move;
-    if (currentDifficulty === 'easy') {
-        move = getRandomMove();
-    } else if (currentDifficulty === 'medium') {
-        move = Math.random() < 0.5 ? getBestMove() : getRandomMove();
-    } else {
-        move = getBestMove();
-    }
+    if (currentDifficulty === 'easy') move = getRandomMove();
+    else if (currentDifficulty === 'medium') move = Math.random() < 0.5 ? getBestMove() : getRandomMove();
+    else move = getBestMove();
+
     if (move !== undefined) makeMove(move, AI);
     if (gameActive) statusText.innerText = texts[currentLang].turn;
 }
