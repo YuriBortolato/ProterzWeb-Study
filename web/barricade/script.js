@@ -217,10 +217,10 @@ function resetTimer() {
         timeSeconds = 0;
         timerEl.innerText = '00:00';
     } else if (currentDifficulty === 'medium') {
-        timeSeconds = 2 * 60; // 2 minutos
+        timeSeconds = 2 * 60; 
         timerEl.innerText = '02:00';
     } else {
-        timeSeconds = 80; // 1 minuto e 20 segundos
+        timeSeconds = 80; 
         timerEl.innerText = '01:20';
     }
 }
@@ -492,8 +492,15 @@ function switchTurn() {
 function makeAiMove() {
     if (!gameActive) return;
 
-    let bestScore = -Infinity;
-    let bestAction = null; 
+    // Dificuldade Fácil: Anda totalmente aleatório, sem usar muros
+    if (currentDifficulty === 'easy') {
+        let moves = getValidMoves(p2Pos);
+        if (moves.length > 0) {
+            let randomMove = moves[Math.floor(Math.random() * moves.length)];
+            movePlayerTo(randomMove.r, randomMove.c);
+        }
+        return;
+    }
 
     let p1Path = getShortestPath(p1Pos, 0);
     let p2Path = getShortestPath(p2Pos, 16);
@@ -501,26 +508,21 @@ function makeAiMove() {
     let p1Dist = p1Path ? p1Path.length : Infinity;
     let p2Dist = p2Path ? p2Path.length : Infinity;
 
-    let moves = getValidMoves(p2Pos);
-    for (let m of moves) {
-        let oldPos = p2Pos; p2Pos = m;
-        let newP2Path = getShortestPath(p2Pos, 16);
-        p2Pos = oldPos; 
-        
-        if (newP2Path) {
-            let score = (p1Dist - newP2Path.length); 
-            if (currentDifficulty !== 'hard') score += (Math.random() * 2 - 1); 
+    let bestAction = null; 
+    
+    // Ação padrão: Dar um passo na rota mais curta (Isso EVITA o loop de ir e voltar!)
+    let baseScore = p1Dist - (p2Dist - 1); 
+    let bestScore = baseScore;
 
-            if (score > bestScore) {
-                bestScore = score;
-                bestAction = { type: 'move', val: m };
-            }
-        }
+    if (p2Path && p2Path.length > 0) {
+        bestAction = { type: 'move', val: p2Path[0] };
     }
 
-    if (p2Walls > 0 && currentDifficulty !== 'easy' && p1Path && p1Path.length > 0) {
+    // Avaliação de Muros
+    if (p2Walls > 0 && p1Path && p1Path.length > 0) {
         let wallCandidates = [];
-        let stepsToBlock = p1Path.slice(0, 4);
+        // Foca nos próximos 3 passos do jogador para tentar atrasá-lo
+        let stepsToBlock = p1Path.slice(0, 3);
         stepsToBlock.push(p1Pos); 
         
         for (let step of stepsToBlock) {
@@ -556,14 +558,22 @@ function makeAiMove() {
                 if (newP1Path && newP2Path) {
                     let newP1Dist = newP1Path.length;
                     let newP2Dist = newP2Path.length;
+                    
                     let score = (newP1Dist - newP2Dist);
                     
+                    // IA Difícil: Se o jogador estiver ganhando a corrida ou empatado, prioriza colocar muro!
                     if (currentDifficulty === 'hard') {
-                        score += (newP1Dist - p1Dist) * 2; 
+                        if (p1Dist <= p2Dist) {
+                            score += (newP1Dist - p1Dist) * 2.5; // Peso agressivo para bloqueio
+                        } else {
+                            score += (newP1Dist - p1Dist);
+                        }
                     } else {
-                        score += Math.random(); 
+                        // IA Média: Pesa menos o bloqueio e adiciona chance de erro (imprecisão)
+                        score += (newP1Dist - p1Dist) * 0.8 + (Math.random() * 2 - 1); 
                     }
 
+                    // Se o muro der uma vantagem maior do que apenas andar para frente
                     if (score > bestScore) {
                         bestScore = score;
                         bestAction = { type: 'wall', val: cand };
