@@ -79,7 +79,10 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .blink-red-fast { animation: flashRed 1s infinite; }
 .flash-red-once { animation: flashRed 1s 1; }
 .rapid-blink { animation: flashRed 0.2s 5; }
+
+/* Cores de Fim de Jogo no Timer */
 .timeout-red { background-color: #9B111E !important; color: white !important; }
+.timeout-green { background-color: #22c55e !important; color: white !important; }
 
 @keyframes flashYellow { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #eab308; color: white; } }
 @keyframes flashRed { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #9B111E; color: white; } }
@@ -125,6 +128,7 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 #restart { padding: 12px 24px; font-size: 1.1rem; font-weight: bold; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
 #restart:hover { background-color: #2563eb; transform: translateY(-2px); }
 
+/* Menu Lateral */
 .side-menu { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: var(--board-bg); box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1000; padding: 20px; }
 .side-menu.open { left: 0; }
 .side-menu h2 { margin-bottom: 30px; color: var(--primary); border-bottom: 2px solid var(--cell-border); padding-bottom: 10px; font-size: 1.5rem;}

@@ -141,8 +141,11 @@ function calculateFade() {
     let currentVol = targetVolume;
 
     if (targetVolume > 0) {
-        if (currentTime < 5) currentVol = targetVolume * (currentTime / 5);
-        else if (timeLeft < 10) currentVol = targetVolume * (timeLeft / 10);
+        if (currentTime < 5) {
+            currentVol = targetVolume * (currentTime / 5);
+        } else if (timeLeft < 10) {
+            currentVol = targetVolume * (timeLeft / 10);
+        }
     }
     bgMusic.volume = Math.max(0, Math.min(currentVol, 1));
 }
@@ -154,7 +157,9 @@ function applyVolumeSettings() {
     else if (volumeState === 1) targetVolume = 0.25;
     else targetVolume = 0.0;
     
-    if (bgMusic.paused) bgMusic.play().catch(()=>{});
+    if (bgMusic.paused) {
+        bgMusic.play().catch(()=>{});
+    }
     calculateFade();
 }
 
@@ -171,6 +176,7 @@ soundBtn.addEventListener('click', () => {
 function playNextTrack(forceRestart = false) {
     const playlist = playlists[currentDifficulty];
     if (forceRestart) currentTrackIndex = 1;
+
     bgMusic.volume = 0;
     bgMusic.src = `${playlist.path}${currentTrackIndex}.mp3`;
     bgMusic.currentTime = 0; 
@@ -420,8 +426,17 @@ function checkGameOver() {
     if (game.in_checkmate()) {
         gameActive = false;
         clearInterval(timerInterval);
-        statusEl.innerText = game.turn() === 'w' ? texts[currentLang].lose : texts[currentLang].win;
-        statusEl.className = game.turn() === 'w' ? "status-red" : "status-green";
+        
+        // Se as pretas estão em mate (turn === 'b'), então o Jogador (Brancas) VENCEU
+        if (game.turn() === 'b') {
+            statusEl.innerText = texts[currentLang].win;
+            statusEl.className = "status-green";
+            timerEl.className = 'timer-box timeout-green';
+        } else {
+            statusEl.innerText = texts[currentLang].lose;
+            statusEl.className = "status-red";
+            timerEl.className = 'timer-box timeout-red';
+        }
         return true;
     } else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) {
         gameActive = false;

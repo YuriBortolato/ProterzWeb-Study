@@ -79,7 +79,10 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .blink-red-fast { animation: flashRed 1s infinite; }
 .flash-red-once { animation: flashRed 1s 1; }
 .rapid-blink { animation: flashRed 0.2s 5; }
+
+/* Cores de Fim de Jogo no Timer */
 .timeout-red { background-color: #9B111E !important; color: white !important; }
+.timeout-green { background-color: #22c55e !important; color: white !important; }
 
 @keyframes flashYellow { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #eab308; color: white; } }
 @keyframes flashRed { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #9B111E; color: white; } }

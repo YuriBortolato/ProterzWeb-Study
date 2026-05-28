@@ -14,8 +14,8 @@
     --p1-color: #ef4444; 
     --p2-color: #3b82f6; 
     
-    --target-p1-bg: rgba(239, 68, 68, 0.15); /* Alvo do Jogador (Vermelho) */
-    --target-p2-bg: rgba(59, 130, 246, 0.15); /* Alvo da IA (Azul) */
+    --target-p1-bg: rgba(239, 68, 68, 0.15); 
+    --target-p2-bg: rgba(59, 130, 246, 0.15); 
 }
 
 body.dark-mode {
@@ -85,7 +85,10 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; text-align: center; }
 .blink-red-fast { animation: flashRed 1s infinite; }
 .rapid-blink { animation: flashRed 0.2s 5; }
 .flash-red-once { animation: flashRed 1s 1; }
+
+/* Cores de Fim de Jogo no Timer */
 .timeout-red { background-color: #9B111E !important; color: white !important; }
+.timeout-green { background-color: #22c55e !important; color: white !important; }
 
 @keyframes flashYellow { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #eab308; color: white; } }
 @keyframes flashRed { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #9B111E; color: white; } }
@@ -105,7 +108,6 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; text-align: center; }
 .cell:hover { filter: brightness(0.9); }
 .cell.valid-move { box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.8); }
 
-/* Cores das linhas de chegada */
 .cell.target-p1 { background-color: var(--target-p1-bg); border: 1px dashed rgba(239, 68, 68, 0.3); }
 .cell.target-p2 { background-color: var(--target-p2-bg); border: 1px dashed rgba(59, 130, 246, 0.3); }
 

@@ -590,9 +590,11 @@ function handleGameOver(winner) {
     if (winner === 'w') {
         statusEl.innerText = texts[currentLang].win;
         statusEl.className = "status-green";
+        timerEl.className = 'timer-box timeout-green';
     } else {
         statusEl.innerText = texts[currentLang].lose;
         statusEl.className = "status-red";
+        timerEl.className = 'timer-box timeout-red';
     }
     renderBoard();
 }

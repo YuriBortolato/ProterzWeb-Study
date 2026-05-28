@@ -141,8 +141,11 @@ function calculateFade() {
     let currentVol = targetVolume;
 
     if (targetVolume > 0) {
-        if (currentTime < 5) currentVol = targetVolume * (currentTime / 5);
-        else if (timeLeft < 10) currentVol = targetVolume * (timeLeft / 10);
+        if (currentTime < 5) {
+            currentVol = targetVolume * (currentTime / 5);
+        } else if (timeLeft < 10) {
+            currentVol = targetVolume * (timeLeft / 10);
+        }
     }
     bgMusic.volume = Math.max(0, Math.min(currentVol, 1));
 }
@@ -154,7 +157,9 @@ function applyVolumeSettings() {
     else if (volumeState === 1) targetVolume = 0.25;
     else targetVolume = 0.0;
     
-    if (bgMusic.paused) bgMusic.play().catch(()=>{});
+    if (bgMusic.paused) {
+        bgMusic.play().catch(()=>{});
+    }
     calculateFade();
 }
 
@@ -184,7 +189,7 @@ bgMusic.onended = () => {
     playNextTrack(false);
 };
 
-// LÓGICA DO RELÓGIO (TIMER)
+// --- LÓGICA DO RELÓGIO (TIMER) ---
 let timerInterval = null;
 let timerStarted = false;
 let timeSeconds = 0;
@@ -491,12 +496,15 @@ function makeAiMove() {
 function handleGameOver(winner) {
     gameActive = false;
     clearInterval(timerInterval);
+    
     if (winner === 'w') {
         statusEl.innerText = texts[currentLang].win;
         statusEl.className = "status-green";
+        timerEl.className = 'timer-box timeout-green';
     } else {
         statusEl.innerText = texts[currentLang].lose;
         statusEl.className = "status-red";
+        timerEl.className = 'timer-box timeout-red';
     }
 }
 
