@@ -19,9 +19,19 @@
     <div class="top-bar">
         <button id="menuBtn" class="icon-btn" title="Menu"><i class="fas fa-bars"></i></button>
         <div class="right-icons">
+            <button id="infoBtn" class="icon-btn" title="Regras"><i class="fas fa-info-circle"></i></button>
             <button id="langBtn" class="icon-btn lang-btn" title="Trocar Idioma">PT</button>
             <button id="soundBtn" class="icon-btn" title="Volume"><i class="fas fa-volume-up"></i></button>
             <button id="themeBtn" class="icon-btn" title="Tema"><i class="fas fa-sun"></i></button>
+        </div>
+    </div>
+
+    <!-- Modal de Regras -->
+    <div id="rulesModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="txtRulesTitle">Regras - Barricade</h2>
+            <p id="txtRulesBody"></p>
+            <button id="closeRulesBtn" class="close-btn">Entendi</button>
         </div>
     </div>
 
@@ -35,25 +45,31 @@
         </div>
 
         <div class="game-layout">
+            <!-- Coluna Esquerda: IA -->
+            <div class="side-hud left-hud">
+                <div class="player-card ai-card">
+                    <h3 id="txtAi">IA (Azul)</h3>
+                    <p id="txtAiWalls">Barricadas: <span id="aiWalls">10</span>/10</p>
+                </div>
+            </div>
+            
+            <!-- Coluna Central: Tabuleiro -->
             <div class="board-column">
                 <div id="playerTimer" class="timer-box">03:00</div>
                 <div class="board-container">
                     <div id="barricadeboard" class="interlock-grid"></div>
                 </div>
-            </div>
-            
-            <div class="hud-column">
-                <div class="player-card ai-card">
-                    <h3>IA (Azul)</h3>
-                    <p>Barricadas: <span id="aiWalls">10</span>/10</p>
-                </div>
-                <div class="player-card human-card">
-                    <h3>Você (Vermelho)</h3>
-                    <p>Barricadas: <span id="humanWalls">10</span>/10</p>
-                </div>
                 <div class="status-area">
                     <h2 id="status">Sua vez!</h2>
                     <button id="restart">Nova Partida</button>
+                </div>
+            </div>
+            
+            <!-- Coluna Direita: Jogador -->
+            <div class="side-hud right-hud">
+                <div class="player-card human-card">
+                    <h3 id="txtHuman">Você (Vermelho)</h3>
+                    <p id="txtHumanWalls">Barricadas: <span id="humanWalls">10</span>/10</p>
                 </div>
             </div>
         </div>

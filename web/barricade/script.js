@@ -7,21 +7,39 @@ const texts = {
         restart: 'Nova Partida', turnW: 'Sua vez!', turnB: 'IA pensando...',
         win: '🎉 Você venceu!', lose: '💀 A IA venceu!', tie: '🤝 Deu Empate!',
         timeout: '⏰ Tempo Esgotado!',
-        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
+        menuTitle: 'Proterz', menuTicTac: 'Jogo da Velha', menuChess: 'Xadrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Regras - Barricade',
+        rulesBody: 'Objetivo: Chegar à linha oposta do tabuleiro primeiro.\n\nNa sua vez, escolha UMA ação:\n1. Mover seu peão 1 casa (cima, baixo, esq., dir.). É permitido pular o oponente se estiverem lado a lado.\n2. Colocar 1 barricada no tabuleiro.\n\nRegras das Barricadas:\n- Cada jogador tem 10 barricadas.\n- Elas bloqueiam a passagem e ocupam 2 espaços (podem ser colocadas na horizontal ou vertical).\n- Você NUNCA pode trancar totalmente o caminho do adversário (deve sempre existir pelo menos uma rota para a chegada).',
+        rulesBtn: 'Entendi',
+        lblAi: 'IA (Azul)',
+        lblHuman: 'Você (Vermelho)',
+        lblWalls: 'Barricadas:'
     },
     'EN': {
         title: 'Barricade', easy: 'Easy', medium: 'Medium', hard: 'Hard',
         restart: 'New Game', turnW: 'Your turn!', turnB: 'AI thinking...',
         win: '🎉 You win!', lose: '💀 AI wins!', tie: '🤝 It\'s a Tie!',
         timeout: '⏰ Time Out!',
-        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade'
+        menuTitle: 'Proterz', menuTicTac: 'Tic Tac Toe', menuChess: 'Chess', menuCheckers: 'Checkers', menuBarricade: 'Barricade',
+        rulesTitle: 'Rules - Barricade',
+        rulesBody: 'Goal: Reach the opposite line of the board first.\n\nOn your turn, choose ONE action:\n1. Move your pawn 1 square (up, down, left, right). You may jump over the opponent if adjacent.\n2. Place 1 barricade on the board.\n\nBarricade Rules:\n- Each player has 10 barricades.\n- They block the path and cover 2 spaces (horizontal or vertical).\n- You CANNOT completely block the opponent\'s path (there must always be a valid route to the goal).',
+        rulesBtn: 'I Got It',
+        lblAi: 'AI (Blue)',
+        lblHuman: 'You (Red)',
+        lblWalls: 'Barricades:'
     },
     'ES': {
         title: 'Barricade', easy: 'Fácil', medium: 'Medio', hard: 'Difícil',
         restart: 'Nueva Partida', turnW: '¡Tu turno!', turnB: 'IA pensando...',
         win: '🎉 ¡Tú ganas!', lose: '💀 ¡La IA gana!', tie: '🤝 ¡Empate!',
         timeout: '⏰ ¡Tiempo Agotado!',
-        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade'
+        menuTitle: 'Proterz', menuTicTac: 'Tres en Raya', menuChess: 'Ajedrez', menuCheckers: 'Damas', menuBarricade: 'Barricade',
+        rulesTitle: 'Reglas - Barricade',
+        rulesBody: 'Objetivo: Llegar a la línea opuesta del tablero primero.\n\nEn tu turno, elige UNA acción:\n1. Mover tu peón 1 casilla (arriba, abajo, izq., der.). Puedes saltar al oponente si están juntos.\n2. Colocar 1 barricada en el tablero.\n\nReglas de las Barricadas:\n- Cada jugador tiene 10 barricadas.\n- Bloquean el paso y ocupan 2 espacios (horizontal o vertical).\n- NUNCA puedes bloquear completamente el camino del oponente (siempre debe existir una ruta válida).',
+        rulesBtn: 'Entendido',
+        lblAi: 'IA (Azul)',
+        lblHuman: 'Tú (Rojo)',
+        lblWalls: 'Barricadas:'
     }
 };
 
@@ -47,8 +65,31 @@ function updateLanguage() {
     document.getElementById('menuChess').innerText = t.menuChess;
     document.getElementById('menuCheckers').innerText = t.menuCheckers;
     document.getElementById('menuBarricade').innerText = t.menuBarricade;
+    
+    // Labels do Jogo
+    document.getElementById('txtAi').innerText = t.lblAi;
+    document.getElementById('txtHuman').innerText = t.lblHuman;
+    document.getElementById('txtAiWalls').innerHTML = `${t.lblWalls} <span id="aiWalls">${p2Walls}</span>/10`;
+    document.getElementById('txtHumanWalls').innerHTML = `${t.lblWalls} <span id="humanWalls">${p1Walls}</span>/10`;
+    
+    // Modal Text
+    document.getElementById('txtRulesTitle').innerText = t.rulesTitle;
+    document.getElementById('txtRulesBody').innerText = t.rulesBody;
+    document.getElementById('closeRulesBtn').innerText = t.rulesBtn;
+
     updateStatusText();
 }
+
+// Modal de Regras
+const infoBtn = document.getElementById('infoBtn');
+const rulesModal = document.getElementById('rulesModal');
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+
+infoBtn.addEventListener('click', () => rulesModal.classList.add('open'));
+closeRulesBtn.addEventListener('click', () => rulesModal.classList.remove('open'));
+rulesModal.addEventListener('click', (e) => {
+    if(e.target === rulesModal) rulesModal.classList.remove('open');
+});
 
 // TEMA
 const themeBtn = document.getElementById('themeBtn');
@@ -220,8 +261,10 @@ function startTimer() {
                 setTimeout(() => timerEl.classList.remove('blink-yellow'), 5000); 
             }
             
-            if (timeSeconds === 15) {
+            if (timeSeconds <= 15) {
                 timerEl.classList.add('blink-red-fast'); 
+            } else {
+                timerEl.classList.remove('blink-red-fast'); 
             }
         }
         
@@ -248,8 +291,8 @@ function timeOutLoss(finalDisplay) {
 let gameActive = true;
 let currentDifficulty = 'hard';
 let currentTurn = 'w'; 
-let p1Pos = { r: 16, c: 8 }; 
-let p2Pos = { r: 0, c: 8 };  
+let p1Pos = { r: 16, c: 8 }; // Player 1 (Red)
+let p2Pos = { r: 0, c: 8 };  // IA (Blue)
 let p1Walls = 10;
 let p2Walls = 10;
 let gridState = Array(17).fill().map(() => Array(17).fill(0)); 
@@ -370,6 +413,11 @@ function renderBoard() {
             
             if (r % 2 === 0 && c % 2 === 0) {
                 el.className = 'cell';
+                
+                // Pintura da Linha de Chegada
+                if (r === 0) el.classList.add('target-p1'); // Objetivo do Jogador (Vermelho)
+                if (r === 16) el.classList.add('target-p2'); // Objetivo da IA (Azul)
+
                 let isTargetMove = validMoves.some(m => m.r === r && m.c === c);
                 if (isTargetMove) {
                     el.classList.add('valid-move');
