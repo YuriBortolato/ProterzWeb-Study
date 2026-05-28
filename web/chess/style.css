@@ -38,6 +38,15 @@ body { background-color: var(--bg-color); color: var(--text-color); transition: 
 
 .right-icons { display: flex; gap: 15px; align-items: center; }
 
+/* Modal de Regras */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal-content { background-color: var(--board-bg); color: var(--text-color); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid var(--cell-border); }
+.modal-content h2 { margin-bottom: 20px; color: var(--primary); text-align: center; font-size: 1.8rem; }
+.modal-content p { white-space: pre-line; text-align: left; line-height: 1.6; margin-bottom: 25px; font-size: 1rem; }
+.close-btn { background-color: var(--primary); color: white; border: none; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; transition: 0.2s; }
+.close-btn:hover { filter: brightness(1.1); }
+
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; }
 h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center; gap: 10px; }
 
@@ -48,7 +57,6 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .diff-btn.active[data-diff="medium"] { background-color: #eab308; color: white; }
 .diff-btn.active[data-diff="hard"] { background-color: #ef4444; color: white; }
 
-/* Cronômetro Centralizado */
 .timer-box {
     font-family: 'Orbitron', 'Courier New', monospace;
     font-variant-numeric: tabular-nums;
@@ -73,22 +81,14 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .rapid-blink { animation: flashRed 0.2s 5; }
 .timeout-red { background-color: #9B111E !important; color: white !important; }
 
-@keyframes flashYellow {
-    0%, 100% { background-color: var(--cell-border); color: var(--text-color); }
-    50% { background-color: #eab308; color: white; }
-}
-@keyframes flashRed {
-    0%, 100% { background-color: var(--cell-border); color: var(--text-color); }
-    50% { background-color: #9B111E; color: white; }
-}
+@keyframes flashYellow { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #eab308; color: white; } }
+@keyframes flashRed { 0%, 100% { background-color: var(--cell-border); color: var(--text-color); } 50% { background-color: #9B111E; color: white; } }
 
 @keyframes softKingPulse {
     0%, 100% { box-shadow: inset 0 0 15px rgba(155, 17, 30, 0.4); background-color: rgba(155, 17, 30, 0.25); }
     50% { box-shadow: inset 0 0 5px rgba(155, 17, 30, 0.1); background-color: transparent; }
 }
-.square.king-pulse {
-    animation: softKingPulse 1.5s infinite ease-in-out;
-}
+.square.king-pulse { animation: softKingPulse 1.5s infinite ease-in-out; }
 
 /* Grid Responsivo do Tabuleiro */
 .board-container { margin-bottom: 20px; border: 4px solid var(--text-color); border-radius: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); background-color: var(--cell-border); }
@@ -116,7 +116,6 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 .square.dark { background-color: var(--dark-square); color: #000; }
 .square.selected { background-color: var(--highlight) !important; }
 
-/* Status e Botões */
 .status-area { text-align: center; }
 #status { margin-bottom: 15px; font-size: 1.5rem; height: 30px; transition: 0.3s; }
 .status-green { text-decoration: underline; text-decoration-color: #22c55e; text-decoration-thickness: 4px; }
@@ -126,7 +125,6 @@ h1 { margin-bottom: 20px; font-size: 2.5rem; display: flex; align-items: center;
 #restart { padding: 12px 24px; font-size: 1.1rem; font-weight: bold; background-color: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
 #restart:hover { background-color: #2563eb; transform: translateY(-2px); }
 
-/* Menu Lateral */
 .side-menu { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: var(--board-bg); box-shadow: 2px 0 10px rgba(0,0,0,0.2); transition: 0.3s; z-index: 1000; padding: 20px; }
 .side-menu.open { left: 0; }
 .side-menu h2 { margin-bottom: 30px; color: var(--primary); border-bottom: 2px solid var(--cell-border); padding-bottom: 10px; font-size: 1.5rem;}
